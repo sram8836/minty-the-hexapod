@@ -2,15 +2,18 @@
 
 ## Technical Goals
 
-### Single-Leg Kinematics Library
+Single-Leg Kinematics Library
  - Leverages assignment 2
-### Multi-Leg Coordination Kinematics Library
+
+Multi-Leg Coordination Kinematics Library
  - Accepts linear and rotational velocity
  - Fault tolerance
  - Gait selection
-### Simulation
+
+Simulation
  - Develop URDF for robot to visualise using Rviz
-### Deployment
+
+Deployment
  - Assembly of open-source hexapod hardware
  - Barebones teleoperation software
  - Deploy on Raspberry Pi 4

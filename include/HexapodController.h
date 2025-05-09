@@ -16,6 +16,10 @@ class HexapodController {
         // Methods
         void inputGait();
 
+        void registerTouch(int leg); // Callback for when sensor of specific leg touches ground
+
+        void updateCommand(int cmd);
+
         // Fault Tolerance
         void checkLegs(); // Check if legs functioning properly
 

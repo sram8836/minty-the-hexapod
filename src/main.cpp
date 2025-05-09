@@ -1,8 +1,9 @@
 #include <iostream>
+#include "HexapodController.h"
 
 int main() {
 
-    // HexapodController hexapod;
+    HexapodController hexapod;
 
     std::cout << "Hexapod" << std::endl;
 

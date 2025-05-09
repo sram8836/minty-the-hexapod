@@ -8,9 +8,13 @@ project(HexapodKinematics)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# Add include directory to headers
+include_directories(${PROJECT_SOURCE_DIR}/include)
+
 # Source Files
 set(SOURCES
     src/main.cpp
+    src/HexapodController.cpp
 )
 
 # Add Executable

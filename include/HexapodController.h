@@ -25,8 +25,9 @@ class HexapodController {
     private:
         // Private members
         std::vector<float> legs;
+        int gaitType;
 
         // Private Helper Methods
         void updateLegs();
-        void setGait();
+        void setGait(int gaitType);
 };

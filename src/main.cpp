@@ -7,6 +7,8 @@ int main() {
 
     std::cout << "Hexapod" << std::endl;
 
+    hexapod.inputGait();
+
 
     return 0;
 }

@@ -1,32 +1,33 @@
-#include <iostream>
-#include "HexapodController.h"
+#include "Brain.h"
 
 
 // Constructor
-HexapodController::HexapodController() {
+Brain::Brain():
+    gaitType( TRIPOD )
+{
     // Initialise legs vector
-    std::cout << "HexapodController Created!" << std::endl;
+    std::cout << "Brain Created!" << std::endl;
     legs.resize(6, 0.0f); // Initialising 6 legs as 0.0
 }
 
 // Destructor
-HexapodController::~HexapodController() {
-    std::cout << "HexapodController Destroyed!" <<std::endl;
+Brain::~Brain() {
+    std::cout << "Brain Destroyed!" <<std::endl;
 }
 
 // Private Methods
-void HexapodController::updateLegs() {
+void Brain::updateLegs() {
     std::cout << "Updating Legs..." << std::endl;
 
 }
 
-void HexapodController::setGait(int gaitType) {
+void Brain::setGait(int gaitType) {
     std::cout << "Setting Gait as Type " << gaitType << std::endl;
     this->gaitType = gaitType;
 }
 
 // Public Methods
-void HexapodController::inputGait() {
+void Brain::inputGait() {
     
     while (true) {
         
@@ -46,11 +47,11 @@ void HexapodController::inputGait() {
     setGait(gaitType);
 }
 
-void HexapodController::checkLegs() {
+void Brain::checkLegs() {
     std::cout << "Checking Legs" << std::endl;
 }
 
-void HexapodController::viewHexapod() {
+void Brain::viewHexapod() {
     std::cout << "Visualising Hexapod" << std::endl;
 }
 

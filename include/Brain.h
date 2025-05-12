@@ -1,17 +1,16 @@
-// HexapodController.h
-
-#pragma once
-
 #include <vector>
+#include <iostream>
 #include <string>
+#include <gaits.h>
 
-class HexapodController {
+
+class Brain {
     public:
         // Constructor
-        HexapodController();
+        Brain();
 
         // Destructor
-        ~HexapodController();
+        ~Brain();
 
         // Methods
         void inputGait();
@@ -29,7 +28,7 @@ class HexapodController {
     private:
         // Private members
         std::vector<float> legs;
-        int gaitType;
+        GaitType gaitType;
 
         // Private Helper Methods
         void updateLegs();

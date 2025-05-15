@@ -30,5 +30,10 @@ class Leg {
         void step(double dir_angle);
 
     private:
+        std::string Status;
+        std::vector<float> jointAngles;
+        
+    
         void getJointAngles();
+
 };

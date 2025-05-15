@@ -9,6 +9,7 @@ Brain::Brain( GaitType aGateType ):
     gaitParams( GaitParameters[aGateType] )
 {
     std::thread loopThread(registerPeriodicCallback, callbackPeriod, myCallback);
+    legs.resize(6, Leg());
     std::cout << "Brain Created!" << std::endl;
 }
 

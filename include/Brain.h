@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include "gaits.h"
+#include "Leg.h"
 #include "periodicCallback.h"
 
 class Brain {
@@ -29,7 +30,7 @@ class Brain {
 
     private:
         // Private members
-        std::vector<float> legs;
+        std::vector<Leg> legs;
         GaitParameterSet gaitParams;
 
         // Private Helper Methods

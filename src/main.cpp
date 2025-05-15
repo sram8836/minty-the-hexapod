@@ -1,9 +1,9 @@
 #include <iostream>
-#include "HexapodController.h"
+#include "Brain.h"
 
 int main() {
 
-    HexapodController hexapod;
+    Brain hexapod;
 
     std::cout << "Hexapod" << std::endl;
 

@@ -1,7 +1,6 @@
-#ifndef GAITS_H
-#define GAITS_H
+#pragma once
 
-#include <vector>
+#include <unordered_map>
 
 const int numLegs = 6;
 
@@ -20,7 +19,7 @@ struct GaitParameterSet {
     int legSequence[numLegs];
 };
 
-std::vector<std::pair<GaitType, GaitParameterSet>> GaitParameters = {
+std::unordered_map<GaitType, GaitParameterSet> GaitParameters = {
     {TRIPOD, {
         180.0f,
         50.0f,
@@ -36,5 +35,3 @@ std::vector<std::pair<GaitType, GaitParameterSet>> GaitParameters = {
         {0,3,1,4,2,5},
     },},
 };
-
-#endif

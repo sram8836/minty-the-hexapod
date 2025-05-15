@@ -1,9 +1,16 @@
-// Leg.h
-
 #pragma once
 
 #include <vector>
 #include <string>
+
+
+enum LegState {
+    INIT,
+    PUSH,
+    LIFT,
+    STOP,
+};
+
 
 class Leg {
     public:

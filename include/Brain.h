@@ -1,13 +1,15 @@
+#pragma once
+
 #include <vector>
 #include <iostream>
 #include <string>
-#include <gaits.h>
-
+#include "gaits.h"
+#include "periodicCallback.h"
 
 class Brain {
     public:
         // Constructor
-        Brain();
+        Brain( GaitType aGateType = TRIPOD );
 
         // Destructor
         ~Brain();
@@ -15,9 +17,9 @@ class Brain {
         // Methods
         void inputGait();
 
-        void registerTouch(int leg); // Callback for when sensor of specific leg touches ground
+        void registerTouch( int leg ); // Callback for when sensor of specific leg touches ground
 
-        void updateCommand(int cmd);
+        void updateCommand( int cmd );
 
         // Fault Tolerance
         void checkLegs(); // Check if legs functioning properly
@@ -28,9 +30,10 @@ class Brain {
     private:
         // Private members
         std::vector<float> legs;
-        GaitType gaitType;
+        GaitParameterSet gaitParams;
 
         // Private Helper Methods
         void updateLegs();
-        void setGait(int gaitType);
+        void setGait( GaitType aNewGaitType );
+        const int callbackPeriod = 10; // milliseconds
 };

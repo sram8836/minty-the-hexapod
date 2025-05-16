@@ -17,3 +17,16 @@ Deployment
  - Assembly of open-source hexapod hardware
  - Barebones teleoperation software
  - Deploy on Raspberry Pi 4
+
+
+ ## Allocations
+ Siddarth
+ - Leg Trajectory 
+ Angus
+ - Bot Building
+ - Basic Functionality Code: Servo Driver + 
+ Harry
+ - Brain
+ Prithik
+ - Leg Kinematics
+

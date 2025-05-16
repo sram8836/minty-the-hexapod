@@ -37,6 +37,7 @@ class Leg {
         float cycleDuration;
         float nextCycleDuration;
         LegState nextState;
+        float sampleRate;
         
         void getJointAngles();
 

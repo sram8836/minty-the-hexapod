@@ -19,6 +19,9 @@ Brain::~Brain() {
     std::cout << "Brain Destroyed!" <<std::endl;
 }
 
+void Brain::updateState(BrainState newState) {
+    state = newState;
+}
 
 void Brain::setGait( GaitType aNewGaitType ) {
     std::cout << "Setting Gait as Type " << aNewGaitType << std::endl;

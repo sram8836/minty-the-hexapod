@@ -6,7 +6,7 @@
 // }
 
 // Constructor
-ServoDriver::ServoDriver():
+ServoDriver::ServoDriver()
 {
     // std::thread loopThread(registerPeriodicCallback, callbackPeriod, myCallback);
     std::cout << "ServoDriver Created!" << std::endl;

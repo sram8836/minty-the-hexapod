@@ -7,6 +7,12 @@
 #include "Leg.h"
 #include "periodicCallback.h"
 
+enum BrainState {
+    INIT,
+    MOVE,
+    STOP,
+};
+
 class Brain {
     public:
         // Constructor
@@ -20,7 +26,7 @@ class Brain {
 
         void registerTouch( int leg ); // Callback for when sensor of specific leg touches ground
 
-        void updateCommand( int cmd );
+        void updateState( BrainState newState);
 
         // Fault Tolerance
         void checkLegs(); // Check if legs functioning properly
@@ -30,6 +36,7 @@ class Brain {
 
     private:
         // Private members
+        BrainState state;
         std::vector<Leg> legs;
         GaitParameterSet gaitParams;
 

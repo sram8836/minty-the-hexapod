@@ -11,7 +11,6 @@ enum LegState {
     STOP,
 };
 
-
 class Leg {
     public:
         // Constructor
@@ -21,19 +20,24 @@ class Leg {
         ~Leg();
 
         // Methods
-        void getStatus();
+        void getState();
 
-        void setMaxServoSpeed(double maxRotationalVelocity);
+        void updateState( LegState nextState, float nextCycleDuration);
 
-        void goToPose();
+        void updateFootTrajectory( std::vector<float> stepFunction);
+
+        void getStepProgress();
 
         void step(double dir_angle);
 
     private:
         std::string Status;
         std::vector<float> jointAngles;
+        std::vector<float> stepFunction;
+        float cycleDuration;
+        float nextCycleDuration;
+        LegState nextState;
         
-    
         void getJointAngles();
 
 };

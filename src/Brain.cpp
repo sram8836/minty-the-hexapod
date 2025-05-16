@@ -1,10 +1,11 @@
 #include "Brain.h"
 
-// Constructor
+
 void myCallback() {
     std::cout << "Callback triggered at " << std::chrono::steady_clock::now().time_since_epoch().count() << "\n";
 }
 
+// Constructor
 Brain::Brain( GaitType aGateType ):
     gaitParams( GaitParameters[aGateType] )
 {

@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <iostream>
 
 
 enum LegState {
@@ -22,21 +23,21 @@ class Leg {
         // Methods
         void getState();
 
+        float getStepProgress();
+
         void updateState( LegState nextState, float nextCycleDuration);
 
         void updateFootTrajectory( std::vector<float> stepFunction);
 
-        void getStepProgress();
-
         void step(double dir_angle);
 
     private:
-        std::string Status;
+        LegState currState;
+        LegState nextState;
         std::vector<float> jointAngles;
         std::vector<float> stepFunction;
         float cycleDuration;
         float nextCycleDuration;
-        LegState nextState;
         float sampleRate;
         
         void getJointAngles();

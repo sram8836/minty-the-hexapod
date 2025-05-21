@@ -2,17 +2,17 @@
 
 Brain* brainPtr = nullptr;
 
-void myCallback() {
+void brainCallback() {
     if (brainPtr) {
         brainPtr->update();
     }
 }
 
 // Constructor
-Brain::Brain(GaitType aGateType)
-    : gaitParams(GaitParameters[aGateType])
+Brain::Brain(GaitType aGaitType)
+    : gaitParams(GaitParameters[aGaitType])
 {
-    legs.resize(numLegs, Leg());
+    legs.resize(numLegs);
     legPhaseOffsets.resize(numLegs);
     legProgress.resize(numLegs, 0.0);
 
@@ -20,7 +20,7 @@ Brain::Brain(GaitType aGateType)
         legPhaseOffsets[i] = (gaitParams.legSequence[i] * gaitParams.phaseDelay) / 360.0;
     }
 
-    std::thread loopThread(registerPeriodicCallback, callbackPeriod, myCallback);
+    std::thread loopThread(registerPeriodicCallback, callbackPeriod, brainCallback);
     loopThread.detach(); //avoid blocking the constructor
 
     brainPtr = this;

@@ -14,7 +14,11 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 # Source Files
 set(SOURCES
     src/main.cpp
-    src/HexapodController.cpp
+    src/Brain.cpp
+    src/Gaits.cpp
+    src/Leg.cpp
+    src/periodicCallback.cpp
+    src/ServoDriver.cpp
 )
 
 # Add Executable

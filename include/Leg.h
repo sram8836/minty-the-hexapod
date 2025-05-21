@@ -9,7 +9,7 @@ enum LegState {
     INIT,
     PUSH,
     LIFT,
-    STOP,
+    FINISH,
 };
 
 class Leg {
@@ -21,17 +21,24 @@ class Leg {
         ~Leg();
 
         // Methods
-        void getState();
+        std::string getState();
 
         float getStepProgress();
 
+        std::array<float, 3> getHomePosition();
+
+        void setHomePosition(const std::array<float, 3>& pos);
+
         void updateState( LegState nextState, float nextCycleDuration);
+
+        void advanceState();
 
         void updateFootTrajectory( std::vector<float> stepFunction);
 
-        void step(double dir_angle);
+        void step(char command);
 
     private:
+        std::array<float, 3> homePosition {0.0f, 0.0f, 0.0f};
         LegState currState;
         LegState nextState;
         std::vector<float> jointAngles;

@@ -3,12 +3,12 @@
 #include <vector>
 #include <iostream>
 #include <string>
-#include "gaits.h"
+#include "Gaits.h"
 #include "Leg.h"
 #include "periodicCallback.h"
 
 enum BrainState {
-    INIT,
+    START,
     MOVE,
     STOP,
 };
@@ -16,7 +16,7 @@ enum BrainState {
 class Brain {
     public:
         // Constructor
-        Brain(GaitType aGateType = TRIPOD);
+        Brain(GaitType aGaitType = TRIPOD);
 
         // Destructor
         ~Brain();

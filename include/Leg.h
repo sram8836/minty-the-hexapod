@@ -7,8 +7,8 @@
 
 enum LegState {
     INIT,
-    PUSH,
-    LIFT,
+    SWING,
+    SLIDE,
     FINISH,
 };
 

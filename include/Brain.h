@@ -7,6 +7,8 @@
 #include "Leg.h"
 #include "periodicCallback.h"
 
+#include <fstream>
+
 enum BrainState {
     START,
     MOVE,
@@ -43,4 +45,9 @@ class Brain {
         void updateLegs();
         void setGait(GaitType aNewGaitType);
         void resyncLegs();
+        
+        std::ofstream syncLog;
+        int tickCount = 0;
+        void logSyncData(); // for CSV leg progress
+
 };

@@ -4,6 +4,8 @@
 #include <string>
 #include <iostream>
 
+#include <array>
+
 
 enum LegState {
     INIT,

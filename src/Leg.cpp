@@ -26,12 +26,12 @@ float Leg::getStepProgress() {
     return 0.0;
 }
 
-std::array<float, 3> Leg::getHomePosition() {
-    return homePosition;
+std::array<float, 3> Leg::getBasePosition() {
+    return basePosition;
 }
 
-void Leg::setHomePosition(const std::array<float, 3>& pos) {
-    homePosition = pos;
+void Leg::setBasePosition(const std::array<float, 3>& pos) {
+    basePosition = pos;
 }
 
 void Leg::updateState( LegState nextState, float nextCycleDuration) {
@@ -98,12 +98,12 @@ void Leg::step(char command) {
         float dy = x * dy_mult; // Lateral Component
         float dz = z;           // Vertical Component
 
-        // Home Position
-        auto homePos = getHomePosition();
+        // Base Position
+        auto basePos = getBasePosition();
 
-        float targetX = homePos[0] + dx;
-        float targetY = homePos[1] + dy;
-        float targetZ = homePos[2] + dz;
+        float targetX = basePos[0] + dx;
+        float targetY = basePos[1] + dy;
+        float targetZ = basePos[2] + dz;
 
         // jointAngles = inverseKinematics(dx, dz);
 

@@ -1,4 +1,5 @@
 #include "Leg.h"
+#include "InverseKinematics.h"
 
 // Constructor
 Leg::Leg()
@@ -118,7 +119,7 @@ void Leg::step(char command) {
         float targetY = basePosition[1] + dy;
         float targetZ = basePosition[2] + dz;
 
-        // jointAngles = inverseKinematics(targetX, targetY, targetZ);
+        jointAngles = InverseKinematics::solve(targetX, targetY, targetZ);
     }
 }
 

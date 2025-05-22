@@ -43,7 +43,7 @@ class Leg {
         std::array<float, 3> basePosition {0.0f, 0.0f, 0.0f};
         LegState currState;
         LegState nextState;
-        std::vector<float> jointAngles;
+        std::array<float, 3> jointAngles;
         std::vector<float> stepFunction;
         float cycleDuration;
         float nextCycleDuration;

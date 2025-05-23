@@ -3,37 +3,35 @@
 #include <cmath>
 #include "serial_writer.h"
 #include "Brain.h"
-#include "Leg.h"
-#include "InverseKinematics.h"
-
-#include <chrono>
-#include <thread>
+#include <cmath>
 
 int main() {
 
     // Brain hexapod;
 
     // std::cout << "Hexapod" << std::endl;
-
     // hexapod.inputGait();
     // hexapod.update();
 
-    SerialPort serial("/dev/tty.usbmodem14201", B9600);
-
-    if (!serial.init()) {
-        return 1;
-    }
-
     Leg leg = Leg(-M_PI/4);
-    for (int i=0; i<200; i++) {
-        leg.step('W');
-        std::array<float, 3> angles = leg.getJointAngles();
-        std::string cmd = "angles:"
-            + std::to_string(angles[2])
-            + ";" + std::to_string(angles[1])
-            + ";" + std::to_string(angles[0]) + "\n";
-        serial.send(cmd);
-    }
+    leg.visualise();
+
+    // SerialPort serial("/dev/tty.usbmodem14201", B9600);
+
+    // if (!serial.init()) {
+    //     return 1;
+    // }
+
+    // Leg leg = Leg(-M_PI/4);
+    // for (int i=0; i<200; i++) {
+    //     leg.step('W');
+    //     std::array<float, 3> angles = leg.getJointAngles();
+    //     std::string cmd = "angles:"
+    //         + std::to_string(angles[2])
+    //         + ";" + std::to_string(angles[1])
+    //         + ";" + std::to_string(angles[0]) + "\n";
+    //     serial.send(cmd);
+    // }
 
     // int forward = 1;
     // float min = -120;

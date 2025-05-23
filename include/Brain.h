@@ -3,7 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
-#include "gaits.h"
+#include "Gaits.h"
 #include "Leg.h"
 #include "periodicCallback.h"
 

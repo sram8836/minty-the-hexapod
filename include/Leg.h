@@ -39,7 +39,9 @@ class Leg {
 
         void updateFootTrajectory( std::vector<float> stepFunction);
 
-        void step(char command);
+        std::array<float, 3> step(char command);
+
+        void visualise();
 
         void test_step(float y);
 

@@ -15,7 +15,7 @@ Brain::Brain(GaitType aGaitType)
 {
     std::vector<float> legAngles = {M_PI/4, 0.0f, -M_PI/4, -M_PI/4, 0.0f, M_PI/4};
 
-    for (int i=0; i<legs.size(); i++) {
+    for (int i=0; i<legAngles.size(); i++) {
         legs.emplace_back(legAngles[i]);
     }
     legPhaseOffsets.resize(numLegs);

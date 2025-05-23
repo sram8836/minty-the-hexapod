@@ -7,51 +7,27 @@
 
 int main() {
 
-    // Brain hexapod;
-
-    // std::cout << "Hexapod" << std::endl;
-    // hexapod.inputGait();
-    // hexapod.update();
-
-    // Leg leg = Leg(-M_PI/4);
-    // leg.visualise();
-
     // SerialPort serial("/dev/tty.usbmodem14201", B9600);
 
     // if (!serial.init()) {
     //     return 1;
     // }
 
-    std::ofstream outFile("step_xyz.csv");
-    outFile << "X,Y,Z\n";
-
-    float x, y, z;
-
-    // Swing
-    for (int i = 0; i <= 200 / 2; ++i) {
-        float t = static_cast<float>(i) / 100;
-        x = 0;
-        y = t * 100;
-        z = 4 * 50 * t * (1 - t); // Parabola
-        outFile << x << "," << y << "," << z << "\n";
-    }
-
-    // SLIDE PHASE: straight line back to origin at ground level
-    for (int i = 0; i <= 200 / 2; ++i) {
-        float t = static_cast<float>(i) / 100;
-        x = 0;
-        y = (1 - t) * 50;
-        z = 0.0f;
-        outFile << x << "," << y << "," << z << "\n";
-    }
-
-    outFile.close();
-
     Leg leg = Leg(-M_PI/4);
+    std::vector<std::tuple<float, float, float>> traj = leg.generateTrajectory(100);
+
+    std::ofstream outFile("step_xyz.csv");
+    outFile << "X, Y, Z\n";
+
+    float x,y,z;
+    for (int i=0; i < traj.size(); i++) {
+        std::tie(x,y,z) = traj[i];
+        outFile << x << "," << y << "," << z << std::endl;
+    }
 
     for (int i=0; i<5; i++) {
         leg.newStep();
-        std::vector<std::tuple<float, float, float>> traj = leg.getTrajectory();
+        
         for (int j=0; j<traj.size(); j++) {
             float a, b, c;
             std::tie(a,b,c) = traj[j];
@@ -63,54 +39,6 @@ int main() {
             // serial.send(cmd);
         }
     }
-
-    // Leg leg = Leg(-M_PI/4);
-    // for (int i=0; i<200; i++) {
-    //     leg.step('W');
-    //     std::array<float, 3> angles = leg.getJointAngles();
-    //     std::string cmd = "angles:"
-    //         + std::to_string(angles[2])
-    //         + ";" + std::to_string(angles[1])
-    //         + ";" + std::to_string(angles[0]) + "\n";
-    //     serial.send(cmd);
-    // }
-    
-
-    // int forward = 1;
-    // float min = -120;
-    // float max = 120;
-    // float y = min;
-
-    // while (1) {
-        
-    //     if (forward && y < max) {
-    //         y += 2.0;
-    //     }
-    //     else if (!forward && y > min) {
-    //         y -= 2.0;
-    //     }
-    //     else {
-    //         forward = !forward;
-    //     }
-
-    //     leg.test_step(y);
-    //     std::array<float, 3> angles = leg.getJointAngles();
-
-    //     std::string cmd = "angles:"
-    //         + std::to_string(angles[2])
-    //         + ";" + std::to_string(angles[1])
-    //         + ";" + std::to_string(angles[0]) + "\n";
-    //     serial.send(cmd);
-
-    //     std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    // }
-
-    // std::array<float, 3> jointAngles = InverseKinematics::solve(150.0, 75.0, 0.0);
-    // std::string cmd = "angles:"
-    //     + std::to_string(jointAngles[2])
-    //     + ";" + std::to_string(jointAngles[1])
-    //     + ";" + std::to_string(jointAngles[0]) + "\n";
-    // serial.send(cmd);
 
     return 0;
 }

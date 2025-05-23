@@ -47,7 +47,11 @@ class Leg {
 
         void test_step(float y);
 
+        std::vector<std::tuple<float, float, float>> generateTrajectory(int n);
+
         void newStep();
+
+        void Leg::takeStep();
 
     private:
         Coord basePosition;

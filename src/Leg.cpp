@@ -1,5 +1,6 @@
 #include "Leg.h"
 #include "InverseKinematics.h"
+#include "serial_writer.h"
 #include <array>
 #include <chrono>
 #include <thread>
@@ -245,6 +246,50 @@ void Leg::visualise() {
 
     outFile.close();
     std::cout << "Trajectory written to step_trajectory.csv\n";
+
+}
+
+std::vector<std::tuple<float, float, float>> Leg::generateTrajectory(int n) {
+    float x, y, z;
+    trajectory;
+
+    // Swing
+    for (int i = 0; i <= n / 2; ++i) {
+        float t = static_cast<float>(i) / (n/2);
+        x = 0;
+        y = t * n;
+        z = 4 * 50 * t * (1 - t); // Parabola
+        trajectory.emplace_back(x, y, z);
+    }
+
+    // SLIDE PHASE: straight line back to origin at ground level
+    for (int i = 0; i <= n / 2; ++i) {
+        float t = static_cast<float>(i) / (n/2);
+        x = 0;
+        y = (1 - t) * n;
+        z = 0.0f;
+        trajectory.emplace_back(x, y, z);
+    }
+    return trajectory;
+}
+
+void Leg::takeStep() {
+    SerialPort serial("/dev/tty.usbmodem14201", B9600);
+
+    if (!serial.init()) {
+        return;
+    }
+        
+    for (int j=0; j<trajectory.size(); j++) {
+        float a, b, c;
+        std::tie(a,b,c) = trajectory[j];
+        std::string cmd = "angles:"
+            + std::to_string(a)
+            + ";" + std::to_string(b)
+            + ";" + std::to_string(c) + "\n";
+        std::cout << cmd << std::endl;
+        serial.send(cmd);
+    }
 
 }
 

@@ -33,7 +33,7 @@ def plot_points_with_lines(points):
     plt.show()
 
 if __name__ == '__main__':
-    filename = 'build/step_trajectory.csv'  # Replace with your actual CSV file path
+    filename = 'build/step_xyz.csv'
     points = load_points_from_csv(filename)
     if points:
         plot_points_with_lines(points)

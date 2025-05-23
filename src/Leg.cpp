@@ -81,149 +81,6 @@ void Leg::setBasePosition(const std::array<float, 3>& pos) {
     basePosition.z = pos[2];
 }
 
-void Leg::updateState( LegState nextState, float nextCycleDuration) {
-    this->nextState = nextState;
-    this->nextCycleDuration = nextCycleDuration;
-}
-
-void Leg::advanceState() {
-    this->currState = this->nextState;
-    this->cycleDuration = this->nextCycleDuration;
-}
-
-void Leg::updateFootTrajectory( std::vector<float> stepFunction) {
-    return;
-}
-
-std::array<float, 3> Leg::step(char command) {
-    
-    float stepLength = 60.0f;  // Step Length
-    float stepHeight = 50.0f;   // Max Step Height
-    const int numPoints = 100;
-    float stepIncrement = 1.0f / numPoints;
-
-    // Global Command Direction Vector (X Longitudinal, Y Sideways)
-    float cmdX = 0.0f;
-    float cmdY = 0.0f;
-
-    // std::cout << "CMD: " << command << std::endl;
-    switch(command) {
-        case 'W':               // Foward
-            cmdY = 1.0f;
-            cmdX = 0.0f;
-            break;
-        case 'S':               // Backward
-            cmdY = -1.0f;
-            cmdX = 0.0f;
-            break;
-        case 'A':               // Left
-            cmdY = 0.0f;     
-            cmdX = 1.0f;
-            break;
-        case 'D':               // Right
-            cmdY = 0.0f;
-            cmdX = -1.0f;
-            break;
-        default:                // Stop
-            cmdY = 0.0f;
-            cmdX = 0.0f;
-            break;
-    }
-
-    // Rotate command vector by leg base angle to get local step direction
-    // x' = x*cos(θ) - y*sin(θ)
-    // y' = x*sin(θ) + y*cos(θ)
-    float dx_mult = cmdX * cos(baseAngle) - cmdY * sin(baseAngle);
-    float dy_mult = cmdX * sin(baseAngle) + cmdY * cos(baseAngle);
-
-    float targetX;
-    float targetY;
-    float targetZ;
-
-
-    switch(currState) {
-        case INIT: {
-            stepProgress = 0.0f;
-            currState = SWING;
-            break;
-        }
-
-        case SWING: {
-            float t = stepProgress / 0.5f;  // Maps [0, 0.5] -> [0, 1]
-
-            float x = t * stepLength;
-
-            float z = 4.0f * stepHeight * t * (1.0f - t);   // Vertical parabola with peak at t=0.5
-
-            // std::cout << "x, z - " << x << " " << z << std::endl;
-
-            float dx = x * cmdX; // Forward Component
-            float dy = x * cmdY; // Lateral Component
-            float dz = z;           // Vertical Component
-
-            // std::cout << "dx, dy, dz " << dx << " " << dy << " " << dz << std::endl;
-
-            targetX = basePosition.x + dx;
-            targetY = basePosition.y + dy;
-            targetZ = basePosition.z + dz;
-
-            try {
-                jointAngles = InverseKinematics::solve(targetX, targetY, targetZ);
-            } catch (const std::domain_error& e) {
-                std::cerr << "IK domain error: " << e.what()
-                        << " at (" << targetX << ", " << targetY << ", " << targetZ << ")"
-                        << std::endl;
-            }
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
-
-            stepProgress += stepIncrement;
-            if (stepProgress >= 0.5f) {
-                currState = SLIDE;
-            }
-            break;
-        }
-
-        case SLIDE: {
-            float t = (stepProgress - 0.5f) / 0.5f;         // Maps [0.5, 1] -> [0,1]
-
-            float x = (1.0f - t) * stepLength;              // Slide backward
-            float z = 0.0f;                                 // No lift
-
-            float dx = x * cmdX; // Backward Component
-            float dy = x * cmdY; // Lateral Component
-            float dz = z;           // Vertical Component
-
-            targetX = basePosition.x + dx;
-            targetY = basePosition.y + dy;
-            targetZ = basePosition.z + dz;
-
-            try {
-                jointAngles = InverseKinematics::solve(targetX, targetY, targetZ);
-            } catch (const std::domain_error& e) {
-                std::cerr << "IK domain error: " << e.what()
-                        << " at (" << targetX << ", " << targetY << ", " << targetZ << ")"
-                        << std::endl;
-            }
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
-            stepProgress += stepIncrement;
-            if (stepProgress >= 1.0f) {
-                currState = FINISH;
-            }
-            break;
-
-        }
-
-        case FINISH: {
-            currState = INIT;
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
-            break;
-        }
-    }
-    return {targetX, targetY, targetZ};
-}
-
 void Leg::visualise() {
 
     
@@ -240,7 +97,7 @@ void Leg::visualise() {
     std::array<float, 3> currPos;
 
     while (currState != FINISH) {
-        currPos = step('W');
+        // currPos = step('W');
         outFile << currPos[0] << "," << currPos[1] << "," << currPos[2] << "\n";
     }
 
@@ -251,25 +108,35 @@ void Leg::visualise() {
 
 std::vector<std::tuple<float, float, float>> Leg::generateTrajectory(int n) {
     float x, y, z;
-    trajectory;
+    float step_length = 100.0f;
+
+    // Half slide
+    for (int i = 0; i <= n/4; ++i) {
+        float t = -0.5 + static_cast<float>(i) / (n/2); // t in (-0.5, 0)
+        x = x_nom + (t)*step_length*std::sin(-baseAngle);
+        y = y_nom + (t)*step_length*std::cos(-baseAngle);
+        z = z_nom;
+        trajectory.emplace_back(x, y, z);
+    }
 
     // Swing
-    for (int i = 0; i <= n / 2; ++i) {
-        float t = static_cast<float>(i) / (n/2);
-        x = 0;
-        y = t * n;
-        z = 4 * 50 * t * (1 - t); // Parabola
+    for (int i = 0; i <= n/2; ++i) {
+        float t = static_cast<float>(i) / (n/2); // t in (-0.5, 0.5)
+        x = x_nom + (t)*step_length*std::sin(-baseAngle) - 0.5*step_length*std::sin(-baseAngle);
+        y = y_nom + (t)*step_length*std::cos(-baseAngle) - 0.5*step_length*std::cos(-baseAngle);
+        z = z_nom + 4 * 50 * t * (1 - t); // Parabola
         trajectory.emplace_back(x, y, z);
     }
 
-    // SLIDE PHASE: straight line back to origin at ground level
-    for (int i = 0; i <= n / 2; ++i) {
-        float t = static_cast<float>(i) / (n/2);
-        x = 0;
-        y = (1 - t) * n;
-        z = 0.0f;
+    // Half slide
+    for (int i = 0; i <= n/4; ++i) {
+        float t = static_cast<float>(i) / (n/2); // t in (0, 0.5)
+        x = x_nom + (t)*step_length*std::sin(-baseAngle);
+        y = y_nom +(t)*step_length*std::cos(-baseAngle);
+        z = z_nom;
         trajectory.emplace_back(x, y, z);
     }
+
     return trajectory;
 }
 
@@ -281,13 +148,18 @@ void Leg::takeStep() {
     }
         
     for (int j=0; j<trajectory.size(); j++) {
-        float a, b, c;
-        std::tie(a,b,c) = trajectory[j];
+        float x, y,z;
+        std::array<float, 3> angles;
+
+        std::tie(x,y,z) = trajectory[j];
+        angles = InverseKinematics::solve(x,y,z);
+
         std::string cmd = "angles:"
-            + std::to_string(a)
-            + ";" + std::to_string(b)
-            + ";" + std::to_string(c) + "\n";
-        std::cout << cmd << std::endl;
+            + std::to_string(angles[2])
+            + ";" + std::to_string(angles[1])
+            + ";" + std::to_string(angles[0]) + "\n";
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
         serial.send(cmd);
     }
 

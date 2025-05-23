@@ -84,7 +84,7 @@ void Brain::updateLegs() {
         legProgress[i] = progress;
 
         if (progress >= legPhaseOffsets[i]) {
-            legs[i].step('W');  // Need to change for WASD input 
+            // legs[i].step('W');  // Need to change for WASD input 
         }
     }
 }

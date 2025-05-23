@@ -7,14 +7,9 @@
 
 int main() {
 
-    // SerialPort serial("/dev/tty.usbmodem14201", B9600);
-
-    // if (!serial.init()) {
-    //     return 1;
-    // }
-
     Leg leg = Leg(-M_PI/4);
     std::vector<std::tuple<float, float, float>> traj = leg.generateTrajectory(100);
+    // leg.takeStep();
 
     std::ofstream outFile("step_xyz.csv");
     outFile << "X, Y, Z\n";
@@ -25,20 +20,7 @@ int main() {
         outFile << x << "," << y << "," << z << std::endl;
     }
 
-    for (int i=0; i<5; i++) {
-        leg.newStep();
-        
-        for (int j=0; j<traj.size(); j++) {
-            float a, b, c;
-            std::tie(a,b,c) = traj[j];
-            std::string cmd = "angles:"
-                + std::to_string(a)
-                + ";" + std::to_string(b)
-                + ";" + std::to_string(c) + "\n";
-            std::cout << cmd << std::endl;
-            // serial.send(cmd);
-        }
-    }
+    outFile.close();
 
     return 0;
 }

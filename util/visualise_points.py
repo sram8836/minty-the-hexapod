@@ -22,7 +22,16 @@ def plot_points_with_lines(points):
     xs, ys, zs = zip(*points)
 
     # Plot the line connecting all points
-    ax.plot(xs, ys, zs, marker='o')
+    ax.plot(xs[1:-1], ys[1:-1], zs[1:-1], marker='o')
+
+    # Plot starting point
+    ax.plot(xs[0], ys[0], zs[0], color='red', marker='o')
+
+    # Plot change point 1
+    ax.plot(xs[25], ys[25], zs[25], color='yellow', marker='o')
+
+    # Plot ending point
+    ax.plot(xs[-1], ys[-1], zs[-1], color='green', marker='o')
 
     # Labels and axes limits (optional)
     ax.set_xlabel('X')

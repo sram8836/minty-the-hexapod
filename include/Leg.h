@@ -45,13 +45,11 @@ class Leg {
 
         void visualise();
 
-        void test_step(float y);
-
         std::vector<std::tuple<float, float, float>> generateTrajectory(int n);
 
         void newStep();
 
-        void Leg::takeStep();
+        void takeStep();
 
     private:
         Coord basePosition;
@@ -65,5 +63,8 @@ class Leg {
         float cycleDuration;
         float nextCycleDuration;
         float sampleRate;
+        const float x_nom = 100.0f;
+        const float y_nom = 0.0f;
+        const float z_nom = -100.0f;
 
 };

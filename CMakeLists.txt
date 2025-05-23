@@ -16,6 +16,7 @@ set(SOURCES
     src/main.cpp
     src/Brain.cpp
     src/Gaits.cpp
+    src/InverseKinematics.cpp
     src/Leg.cpp
     src/periodicCallback.cpp
     src/ServoDriver.cpp

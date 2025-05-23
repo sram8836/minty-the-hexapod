@@ -5,6 +5,8 @@
 Leg::Leg()
 {
     std::cout << "Leg Created!" << std::endl;
+    currState = INIT;
+    stepProgress = 0.0f;
 }
 
 // Destructor
@@ -23,8 +25,7 @@ std::string Leg::getState() {
 }
 
 float Leg::getStepProgress() {
-    // What is this referring to?
-    return 0.0;
+    return stepProgress;
 }
 
 std::array<float, 3> Leg::getBasePosition() {
@@ -46,14 +47,15 @@ void Leg::advanceState() {
 }
 
 void Leg::updateFootTrajectory( std::vector<float> stepFunction) {
-    this->stepFunction = stepFunction;
+    return;
 }
 
 void Leg::step(char command) {
     
     float stepLength = 100.0f;  // Step Length
     float stepHeight = 50.0f;   // Max Step Height
-    const int numPoints = 100; 
+    const int numPoints = 100;
+    float stepIncrement = 1.0f / numPoints;
 
     // Initialise Directional ∆s
     float dx_mult = 0.0f;
@@ -83,43 +85,69 @@ void Leg::step(char command) {
             break;
     }
 
-    // Swing Phase
-    for (size_t i=0; i < numPoints/2; ++i) {
-        float t = static_cast<float>(i) / (numPoints/2 - 1);  // Normalised Progress Value
 
-        float x;
-        x = t * stepLength;
+    switch(currState) {
+        case INIT: {
+            stepProgress = 0.0f;
+            currState = SWING;
+            break;
+        }
 
-        float z = 4.0f * stepHeight * t * (1.0f - t);   // Vertical parabola with peak at t=0.5
+        case SWING: {
+            float t = stepProgress;
 
-        float dx = x * dx_mult; // Forward Component
-        float dy = x * dy_mult; // Lateral Component
-        float dz = z;           // Vertical Component
+            float x = t * stepLength;
 
-        float targetX = basePosition[0] + dx;
-        float targetY = basePosition[1] + dy;
-        float targetZ = basePosition[2] + dz;
+            float z = 4.0f * stepHeight * t * (1.0f - t);   // Vertical parabola with peak at t=0.5
 
-        jointAngles = InverseKinematics::solve(targetX, targetY, targetZ);
+            float dx = x * dx_mult; // Forward Component
+            float dy = x * dy_mult; // Lateral Component
+            float dz = z;           // Vertical Component
 
+            float targetX = basePosition[0] + dx;
+            float targetY = basePosition[1] + dy;
+            float targetZ = basePosition[2] + dz;
+
+            jointAngles = InverseKinematics::solve(targetX, targetY, targetZ);
+
+            stepProgress += stepIncrement;
+            if (stepProgress >= 1.0f) {
+                stepProgress = 0.0f;
+                currState = SLIDE;
+            }
+            break;
+        }
+
+        case SLIDE: {
+            float t = stepProgress;
+
+            float x = (1.0f - t) * stepLength;              // Slide backward
+            float z = 0.0f;                                 // No lift
+
+            float dx = x * dx_mult; // Backward Component
+            float dy = x * dy_mult; // Lateral Component
+            float dz = z;           // Vertical Component
+
+            float targetX = basePosition[0] + dx;
+            float targetY = basePosition[1] + dy;
+            float targetZ = basePosition[2] + dz;
+
+            jointAngles = InverseKinematics::solve(targetX, targetY, targetZ);
+
+            stepProgress += stepIncrement;
+            if (stepProgress >= 1.0f) {
+                stepProgress = 1.0f;
+                currState = FINISH;
+            }
+            break;
+
+        }
+
+        case FINISH: {
+            currState = INIT;
+            break;
+        }
     }
-
-    // Slide Phase
-    for (size_t i=0; i < numPoints/2; ++i) {
-        float t = static_cast<float>(i) / (numPoints/2 - 1);  // Normalised Progress Value
-
-        float x = (1.0f - t) * stepLength;              // Slide backward
-        float z = 0.0f;                                 // No lift
-
-        float dx = x * dx_mult; // Backward Component
-        float dy = x * dy_mult; // Lateral Component
-        float dz = z;           // Vertical Component
-
-        float targetX = basePosition[0] + dx;
-        float targetY = basePosition[1] + dy;
-        float targetZ = basePosition[2] + dz;
-
-        jointAngles = InverseKinematics::solve(targetX, targetY, targetZ);
-    }
+    
 }
 

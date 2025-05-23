@@ -94,7 +94,7 @@ void Leg::step(char command) {
         }
 
         case SWING: {
-            float t = stepProgress;
+            float t = stepProgress / 0.5f;  // Maps [0, 0.5] -> [0, 1]
 
             float x = t * stepLength;
 
@@ -111,15 +111,14 @@ void Leg::step(char command) {
             jointAngles = InverseKinematics::solve(targetX, targetY, targetZ);
 
             stepProgress += stepIncrement;
-            if (stepProgress >= 1.0f) {
-                stepProgress = 0.0f;
+            if (stepProgress >= 0.5f) {
                 currState = SLIDE;
             }
             break;
         }
 
         case SLIDE: {
-            float t = stepProgress;
+            float t = (stepProgress - 0.5f) - 0.5f;         // Maps [0.5, 1] -> [0,1]
 
             float x = (1.0f - t) * stepLength;              // Slide backward
             float z = 0.0f;                                 // No lift
@@ -136,7 +135,6 @@ void Leg::step(char command) {
 
             stepProgress += stepIncrement;
             if (stepProgress >= 1.0f) {
-                stepProgress = 1.0f;
                 currState = FINISH;
             }
             break;

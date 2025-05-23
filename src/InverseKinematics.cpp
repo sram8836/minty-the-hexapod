@@ -1,10 +1,16 @@
 #include "InverseKinematics.h"
+#include <iostream>
+#include <cmath>
+
+float radToDeg(float radians) {
+    return radians * (180.0 / M_PI);
+}
 
 std::array<float, 3> InverseKinematics::solve(float x, float y, float z) {
     // DH constants
-    const float l1 = 0.25f;  // link 1
-    const float l2 = 0.5f;   // link 2
-    const float l3 = 0.5f;   // link 3
+    const float l1 = 43.0f;  // L1: Coxa
+    const float l2 = 80.0f;  // L2: Femur
+    const float l3 = 134.0f; // L3: Tibia
 
     // joint 1, axis rotates about z
     float theta1 = std::atan2(y, x);
@@ -33,5 +39,7 @@ std::array<float, 3> InverseKinematics::solve(float x, float y, float z) {
     float k2 = l3 * std::sin(theta3);
     float theta2 = std::atan2(z1, x1) - std::atan2(k2, k1);
 
-    return {theta1, theta2, theta3};
+    // std::cout << theta1 << ", " << theta2 << ", " << theta3 << ", " << std::endl;
+
+    return {radToDeg(theta1), radToDeg(theta2)-45, radToDeg(theta3)+135};
 }

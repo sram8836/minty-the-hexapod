@@ -8,9 +8,9 @@
 #include <chrono>
 #include <thread>
 
-const float l1 = 0.25f;
-const float l2 = 0.5f;
-const float l3 = 0.5f;
+const float l1 = 43.0f;  // L1: Coxa
+const float l2 = 80.0f;  // L2: Femur
+const float l3 = 134.0f; // L3: Tibia
 
 // FK similar to python scripts
 std::vector<std::array<float, 3>> forwardKinematics(const std::array<float, 3>& angles) {
@@ -46,8 +46,8 @@ std::vector<std::array<float, 3>> forwardKinematics(const std::array<float, 3>& 
 }
 
 int main() {
-    float radius = 0.6f;
-    float height = -0.3f;
+    float radius = 200.0f;
+    float height = -50.0f;
     int steps = 20;
 
     std::ofstream outFile("util/kinematics/leg_trajectory0.csv");

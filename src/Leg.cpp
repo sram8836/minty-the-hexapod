@@ -1,5 +1,6 @@
 #include "Leg.h"
 #include "InverseKinematics.h"
+#include <array>
 
 // Constructor
 Leg::Leg(float aBaseAngle)
@@ -115,7 +116,7 @@ void Leg::step(char command) {
             float targetY = basePosition[1] + dy;
             float targetZ = basePosition[2] + dz;
 
-            jointAngles = InverseKinematics::solve(targetX, targetY, targetZ);
+            std::array<float, 3> jointAngles = InverseKinematics::solve(targetX, targetY, targetZ);
 
             stepProgress += stepIncrement;
             if (stepProgress >= 0.5f) {
@@ -153,6 +154,4 @@ void Leg::step(char command) {
             break;
         }
     }
-    
 }
-

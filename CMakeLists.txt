@@ -18,6 +18,7 @@ set(SOURCES
     src/Gaits.cpp
     src/InverseKinematics.cpp
     src/Leg.cpp
+    src/InverseKinematics.cpp
     src/periodicCallback.cpp
     src/ServoDriver.cpp
 )

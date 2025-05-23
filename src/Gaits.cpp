@@ -1,5 +1,5 @@
 // Gaits.cpp
-#include "Gaits.h"
+#include "gaits.h"
 
 std::unordered_map<GaitType, GaitParameterSet> GaitParameters = {
     {TRIPOD, {

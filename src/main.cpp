@@ -13,14 +13,29 @@ int main() {
     // hexapod.inputGait();
     // hexapod.update();
 
+    // Leg leg = Leg(-M_PI/4);
+    // leg.visualise();
+
+    SerialPort serial("/dev/tty.usbmodem14201", B9600);
+
+    if (!serial.init()) {
+        return 1;
+    }
+
     Leg leg = Leg(-M_PI/4);
-    leg.visualise();
-
-    // SerialPort serial("/dev/tty.usbmodem14201", B9600);
-
-    // if (!serial.init()) {
-    //     return 1;
-    // }
+    for (int i=0; i<5; i++) {
+        leg.newStep();
+        std::vector<std::tuple<float, float, float>> traj = leg.getTrajectory();
+        for (int j=0; j<traj.size(); j++) {
+            float a, b, c;
+            std::tie(a,b,c) = traj[j];
+            std::string cmd = "angles:"
+                + std::to_string(a)
+                + ";" + std::to_string(b)
+                + ";" + std::to_string(c) + "\n";
+            serial.send(cmd);
+        }
+    }
 
     // Leg leg = Leg(-M_PI/4);
     // for (int i=0; i<200; i++) {
@@ -32,6 +47,7 @@ int main() {
     //         + ";" + std::to_string(angles[0]) + "\n";
     //     serial.send(cmd);
     // }
+    
 
     // int forward = 1;
     // float min = -120;

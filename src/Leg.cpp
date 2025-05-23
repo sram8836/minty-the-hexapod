@@ -34,15 +34,21 @@ float Leg::getStepProgress() {
 }
 
 std::array<float, 3> Leg::getBasePosition() {
-    return basePosition;
+    return {basePosition.x, basePosition.y, basePosition.z};
 }
 
 std::array<float, 3> Leg::getJointAngles() {
     return jointAngles;
 }
 
+std::vector<std::tuple<float, float, float>> Leg::getTrajectory() {
+    return trajectory;
+}
+
 void Leg::setBasePosition(const std::array<float, 3>& pos) {
-    basePosition = pos;
+    basePosition.x = pos[0];
+    basePosition.y = pos[1];
+    basePosition.z = pos[2];
 }
 
 void Leg::updateState( LegState nextState, float nextCycleDuration) {
@@ -127,9 +133,9 @@ std::array<float, 3> Leg::step(char command) {
 
             // std::cout << "dx, dy, dz " << dx << " " << dy << " " << dz << std::endl;
 
-            targetX = basePosition[0] + dx;
-            targetY = basePosition[1] + dy;
-            targetZ = basePosition[2] + dz;
+            targetX = basePosition.x + dx;
+            targetY = basePosition.y + dy;
+            targetZ = basePosition.z + dz;
 
             try {
                 jointAngles = InverseKinematics::solve(targetX, targetY, targetZ);
@@ -158,9 +164,9 @@ std::array<float, 3> Leg::step(char command) {
             float dy = x * cmdY; // Lateral Component
             float dz = z;           // Vertical Component
 
-            targetX = basePosition[0] + dx;
-            targetY = basePosition[1] + dy;
-            targetZ = basePosition[2] + dz;
+            targetX = basePosition.x + dx;
+            targetY = basePosition.y + dy;
+            targetZ = basePosition.z + dz;
 
             try {
                 jointAngles = InverseKinematics::solve(targetX, targetY, targetZ);
@@ -213,3 +219,34 @@ void Leg::visualise() {
 
 }
 
+void Leg::newStep() {
+
+    currState = INIT;
+    int counter = 0;
+
+    float currX;
+    float currY;
+    float currZ;
+
+    while (currState != FINISH) {
+        if (counter < 50) {
+            currState = SWING;
+        }
+        else if (counter < 100) {
+            currState = SLIDE;
+        }
+        else {
+            currState = FINISH;
+        }
+
+        currX = stepFunction[counter].x;
+        currY = stepFunction[counter].y;
+        currZ = stepFunction[counter].z;
+
+        std::array<float, 3> angles = InverseKinematics::solve(currX, currY, currZ);
+        trajectory.emplace_back(angles[0], angles[1], angles[2]);
+        
+        counter++;
+    }
+
+}

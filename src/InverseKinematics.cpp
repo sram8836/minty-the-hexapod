@@ -6,11 +6,19 @@ float radToDeg(float radians) {
     return radians * (180.0 / M_PI);
 }
 
+float degToRad(float degrees) {
+    return degrees * (M_PI / 180.0);
+}
+
 std::array<float, 3> InverseKinematics::solve(float x, float y, float z) {
     // DH constants
     const float l1 = 43.0f;  // L1: Coxa
     const float l2 = 80.0f;  // L2: Femur
     const float l3 = 134.0f; // L3: Tibia
+
+    // Mechanical offsets (in radians)
+    const float SHOULDER_OFFSET_RAD = degToRad(-45.0f); // theta2
+    const float ELBOW_OFFSET_RAD = degToRad(135.0f);    // theta3
 
     // joint 1, axis rotates about z
     float theta1 = std::atan2(y, x);
@@ -32,14 +40,12 @@ std::array<float, 3> InverseKinematics::solve(float x, float y, float z) {
     float theta3 = std::acos(cosTheta3);
 
     // Elbow-down configuration
-    theta3 = -theta3;
+    theta3 = -theta3 + ELBOW_OFFSET_RAD;
 
     // Law of Cosines for shoulder angle (theta2)
-    float k1 = l2 + l3 * std::cos(theta3);
-    float k2 = l3 * std::sin(theta3);
-    float theta2 = std::atan2(z1, x1) - std::atan2(k2, k1);
+    float k1 = l2 + l3 * std::cos(theta3 - ELBOW_OFFSET_RAD);
+    float k2 = l3 * std::sin(theta3 - ELBOW_OFFSET_RAD);
+    float theta2 = std::atan2(z1, x1) - std::atan2(k2, k1) + SHOULDER_OFFSET_RAD;
 
-    // std::cout << theta1 << ", " << theta2 << ", " << theta3 << ", " << std::endl;
-
-    return {radToDeg(theta1), radToDeg(theta2)-45, radToDeg(theta3)+135};
+    return {radToDeg(theta1), radToDeg(theta2), radToDeg(-theta3)};
 }

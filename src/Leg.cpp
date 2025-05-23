@@ -1,6 +1,8 @@
 #include "Leg.h"
 #include "InverseKinematics.h"
 #include <array>
+#include <chrono>
+#include <thread>
 
 // Constructor
 Leg::Leg(float aBaseAngle)
@@ -8,6 +10,7 @@ Leg::Leg(float aBaseAngle)
     currState = INIT;
     stepProgress = 0.0f;
     baseAngle = aBaseAngle;
+    basePosition = {100.0, 50.0, -50.0};
     std::cout << "Leg created at " << baseAngle << "º!" << std::endl;
 }
 
@@ -34,6 +37,10 @@ std::array<float, 3> Leg::getBasePosition() {
     return basePosition;
 }
 
+std::array<float, 3> Leg::getJointAngles() {
+    return jointAngles;
+}
+
 void Leg::setBasePosition(const std::array<float, 3>& pos) {
     basePosition = pos;
 }
@@ -52,6 +59,11 @@ void Leg::updateFootTrajectory( std::vector<float> stepFunction) {
     return;
 }
 
+void Leg::test_step(float y) {
+    std::cout << "Going to: " << y << ",0.0 , 0.0" << std::endl;
+    jointAngles = InverseKinematics::solve(100.0, y, -100.0);
+}
+
 void Leg::step(char command) {
     
     float stepLength = 100.0f;  // Step Length
@@ -63,7 +75,7 @@ void Leg::step(char command) {
     float cmdX = 0.0f;
     float cmdY = 0.0f;
 
-    std::cout << "CMD: " << command << std::endl;
+    // std::cout << "CMD: " << command << std::endl;
     switch(command) {
         case 'W':               // Foward
             cmdX = 1.0f;
@@ -90,8 +102,8 @@ void Leg::step(char command) {
     // Rotate command vector by leg base angle to get local step direction
     // x' = x*cos(θ) - y*sin(θ)
     // y' = x*sin(θ) + y*cos(θ)
-    float dx_mult = cmdX * cos(baseAngle) - cmdY * sin(baseAngle);
-    float dy_mult = cmdX * sin(baseAngle) + cmdY * cos(baseAngle);
+    // float dx_mult = cmdX * cos(baseAngle) - cmdY * sin(baseAngle);
+    // float dy_mult = cmdX * sin(baseAngle) + cmdY * cos(baseAngle);
 
 
     switch(currState) {
@@ -108,15 +120,21 @@ void Leg::step(char command) {
 
             float z = 4.0f * stepHeight * t * (1.0f - t);   // Vertical parabola with peak at t=0.5
 
-            float dx = x * dx_mult; // Forward Component
-            float dy = x * dy_mult; // Lateral Component
+            // std::cout << "x, z - " << x << " " << z << std::endl;
+
+            float dx = x * cmdX; // Forward Component
+            float dy = x * cmdY; // Lateral Component
             float dz = z;           // Vertical Component
+
+            // std::cout << "dx, dy, dz " << dx << " " << dy << " " << dz << std::endl;
 
             float targetX = basePosition[0] + dx;
             float targetY = basePosition[1] + dy;
             float targetZ = basePosition[2] + dz;
-
-            std::array<float, 3> jointAngles = InverseKinematics::solve(targetX, targetY, targetZ);
+            
+            std::cout << "Swing Target: " << targetX << ", " << targetY << ", " << targetZ << std::endl;
+            jointAngles = InverseKinematics::solve(targetX, targetY, targetZ);
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
             stepProgress += stepIncrement;
             if (stepProgress >= 0.5f) {
@@ -131,15 +149,17 @@ void Leg::step(char command) {
             float x = (1.0f - t) * stepLength;              // Slide backward
             float z = 0.0f;                                 // No lift
 
-            float dx = x * dx_mult; // Backward Component
-            float dy = x * dy_mult; // Lateral Component
+            float dx = x * cmdX; // Backward Component
+            float dy = x * cmdY; // Lateral Component
             float dz = z;           // Vertical Component
 
             float targetX = basePosition[0] + dx;
             float targetY = basePosition[1] + dy;
             float targetZ = basePosition[2] + dz;
 
+            std::cout << "Slide Target: " << targetX << ", " << targetY << ", " << targetZ << std::endl;
             jointAngles = InverseKinematics::solve(targetX, targetY, targetZ);
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
             stepProgress += stepIncrement;
             if (stepProgress >= 1.0f) {
@@ -151,6 +171,7 @@ void Leg::step(char command) {
 
         case FINISH: {
             currState = INIT;
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
             break;
         }
     }

@@ -29,6 +29,8 @@ class Leg {
 
         std::array<float, 3> getBasePosition();
 
+        std::array<float, 3> getJointAngles();
+
         void setBasePosition(const std::array<float, 3>& pos);
 
         void updateState( LegState nextState, float nextCycleDuration);
@@ -39,8 +41,10 @@ class Leg {
 
         void step(char command);
 
+        void test_step(float y);
+
     private:
-        std::array<float, 3> basePosition {0.0f, 0.0f, 0.0f};
+        std::array<float, 3> basePosition;
         float baseAngle;
         std::array<float, 3> jointAngles;
         LegState currState;
@@ -49,7 +53,5 @@ class Leg {
         float cycleDuration;
         float nextCycleDuration;
         float sampleRate;
-        
-        void getJointAngles();
 
 };

@@ -16,13 +16,39 @@ int main() {
     // Leg leg = Leg(-M_PI/4);
     // leg.visualise();
 
-    SerialPort serial("/dev/tty.usbmodem14201", B9600);
+    // SerialPort serial("/dev/tty.usbmodem14201", B9600);
 
-    if (!serial.init()) {
-        return 1;
+    // if (!serial.init()) {
+    //     return 1;
+    // }
+
+    std::ofstream outFile("step_xyz.csv");
+    outFile << "X,Y,Z\n";
+
+    float x, y, z;
+
+    // Swing
+    for (int i = 0; i <= 200 / 2; ++i) {
+        float t = static_cast<float>(i) / 100;
+        x = 0;
+        y = t * 100;
+        z = 4 * 50 * t * (1 - t); // Parabola
+        outFile << x << "," << y << "," << z << "\n";
     }
 
+    // SLIDE PHASE: straight line back to origin at ground level
+    for (int i = 0; i <= 200 / 2; ++i) {
+        float t = static_cast<float>(i) / 100;
+        x = 0;
+        y = (1 - t) * 50;
+        z = 0.0f;
+        outFile << x << "," << y << "," << z << "\n";
+    }
+
+    outFile.close();
+
     Leg leg = Leg(-M_PI/4);
+
     for (int i=0; i<5; i++) {
         leg.newStep();
         std::vector<std::tuple<float, float, float>> traj = leg.getTrajectory();
@@ -33,7 +59,8 @@ int main() {
                 + std::to_string(a)
                 + ";" + std::to_string(b)
                 + ";" + std::to_string(c) + "\n";
-            serial.send(cmd);
+            std::cout << cmd << std::endl;
+            // serial.send(cmd);
         }
     }
 

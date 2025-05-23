@@ -11,6 +11,35 @@ Leg::Leg(float aBaseAngle)
     currState = INIT;
     stepProgress = 0.0f;
     baseAngle = aBaseAngle;
+    basePosition = {150, 0, -50};
+
+    std::ifstream inFile("step_xyz.csv");
+    if (!inFile.is_open()) {
+        std::cerr << "[ERROR] Could not open step_xyz.csv\n";
+        return;
+    }
+
+    std::string line;
+    std::getline(inFile, line);
+
+    while (std::getline(inFile, line)) {
+        std::stringstream ss(line);
+        std::string token;
+        Coord coord;
+
+        std::getline(ss, token, ',');
+        coord.x = std::stof(token);
+
+        std::getline(ss, token, ',');
+        coord.y = std::stof(token);
+
+        std::getline(ss, token, ',');
+        coord.z = std::stof(token);
+
+        stepFunction.push_back(coord);
+    }
+
+    inFile.close();
     std::cout << "Leg created at " << baseAngle << "!" << std::endl;
 }
 
@@ -239,9 +268,9 @@ void Leg::newStep() {
             currState = FINISH;
         }
 
-        currX = stepFunction[counter].x;
-        currY = stepFunction[counter].y;
-        currZ = stepFunction[counter].z;
+        currX = basePosition.x + stepFunction[counter].x;
+        currY = basePosition.y + stepFunction[counter].y;
+        currZ = basePosition.z + stepFunction[counter].z;
 
         std::array<float, 3> angles = InverseKinematics::solve(currX, currY, currZ);
         trajectory.emplace_back(angles[0], angles[1], angles[2]);

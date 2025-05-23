@@ -110,11 +110,11 @@ std::vector<std::tuple<float, float, float>> Leg::generateTrajectory(int n) {
     float x, y, z;
     float step_length = 100.0f;
 
-    // Half slide
+    // Half Slide 1
     for (int i = 0; i <= n/4; ++i) {
-        float t = -0.5 + static_cast<float>(i) / (n/2); // t in (-0.5, 0)
-        x = x_nom + (t)*step_length*std::sin(-baseAngle);
-        y = y_nom + (t)*step_length*std::cos(-baseAngle);
+        float t = static_cast<float>(i) / (n/2); // t in (-0.5, 0)
+        x = x_nom - (t)*step_length*std::sin(-baseAngle);
+        y = y_nom - (t)*step_length*std::cos(-baseAngle);
         z = z_nom;
         trajectory.emplace_back(x, y, z);
     }
@@ -122,17 +122,17 @@ std::vector<std::tuple<float, float, float>> Leg::generateTrajectory(int n) {
     // Swing
     for (int i = 0; i <= n/2; ++i) {
         float t = static_cast<float>(i) / (n/2); // t in (-0.5, 0.5)
-        x = x_nom + (t)*step_length*std::sin(-baseAngle) - 0.5*step_length*std::sin(-baseAngle);
-        y = y_nom + (t)*step_length*std::cos(-baseAngle) - 0.5*step_length*std::cos(-baseAngle);
+        x = x_nom + (t-0.5)*step_length*std::sin(-baseAngle);
+        y = y_nom + (t-0.5)*step_length*std::cos(-baseAngle);
         z = z_nom + 4 * 50 * t * (1 - t); // Parabola
         trajectory.emplace_back(x, y, z);
     }
 
-    // Half slide
+    // Half Slide 2
     for (int i = 0; i <= n/4; ++i) {
         float t = static_cast<float>(i) / (n/2); // t in (0, 0.5)
-        x = x_nom + (t)*step_length*std::sin(-baseAngle);
-        y = y_nom +(t)*step_length*std::cos(-baseAngle);
+        x = x_nom + (0.5-t)*step_length*std::sin(-baseAngle);
+        y = y_nom + (0.5-t)*step_length*std::cos(-baseAngle);
         z = z_nom;
         trajectory.emplace_back(x, y, z);
     }

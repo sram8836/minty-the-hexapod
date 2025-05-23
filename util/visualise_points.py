@@ -21,17 +21,26 @@ def plot_points_with_lines(points):
 
     xs, ys, zs = zip(*points)
 
-    # Plot the line connecting all points
-    ax.plot(xs[1:-1], ys[1:-1], zs[1:-1], marker='o')
+    # Plot first halfslide
+    ax.plot(xs[0:26], ys[0:26], zs[0:26], color='red')
+
+    # Plot swing
+    ax.plot(xs[26:-26], ys[26:-26], zs[26:-26], color='blue')
+
+    # Plot second halfslide
+    ax.plot(xs[-26:], ys[-26:], zs[-26:], color = 'green')
 
     # Plot starting point
     ax.plot(xs[0], ys[0], zs[0], color='red', marker='o')
 
     # Plot change point 1
-    ax.plot(xs[25], ys[25], zs[25], color='yellow', marker='o')
+    ax.plot(xs[26], ys[26], zs[26], color='blue', marker='o')
+
+    # Plot change point 2
+    ax.plot(xs[-26], ys[-26], zs[-26], color='green', marker='o')
 
     # Plot ending point
-    ax.plot(xs[-1], ys[-1], zs[-1], color='green', marker='o')
+    ax.plot(xs[-1], ys[-1], zs[-1], color='black', marker='x')
 
     # Labels and axes limits (optional)
     ax.set_xlabel('X')

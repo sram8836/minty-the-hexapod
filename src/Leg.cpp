@@ -2,11 +2,12 @@
 #include "InverseKinematics.h"
 
 // Constructor
-Leg::Leg()
+Leg::Leg(float aBaseAngle)
 {
-    std::cout << "Leg Created!" << std::endl;
     currState = INIT;
     stepProgress = 0.0f;
+    baseAngle = aBaseAngle;
+    std::cout << "Leg created at " << baseAngle << "º!" << std::endl;
 }
 
 // Destructor
@@ -57,33 +58,39 @@ void Leg::step(char command) {
     const int numPoints = 100;
     float stepIncrement = 1.0f / numPoints;
 
-    // Initialise Directional ∆s
-    float dx_mult = 0.0f;
-    float dy_mult = 0.0f;
+    // Global Command Direction Vector (X Longitudinal, Y Sideways)
+    float cmdX = 0.0f;
+    float cmdY = 0.0f;
 
     std::cout << "CMD: " << command << std::endl;
     switch(command) {
-        case 'W':
-            dx_mult = 1.0f;     // Foward
-            dy_mult = 0.0f;
+        case 'W':               // Foward
+            cmdX = 1.0f;
+            cmdY = 0.0f;
             break;
-        case 'S':
-            dx_mult = -1.0f;    // Backward
-            dy_mult = 0.0f;
+        case 'S':               // Backward
+            cmdX = -1.0f;
+            cmdY = 0.0f;
             break;
-        case 'A':
-            dx_mult = 0.0f;     
-            dy_mult = 1.0f;     // Left
+        case 'A':               // Left
+            cmdX = 0.0f;     
+            cmdY = 1.0f;
             break;
-        case 'D':
-            dx_mult = 0.0f;
-            dy_mult = -1.0f;    // Right
+        case 'D':               // Right
+            cmdX = 0.0f;
+            cmdY = -1.0f;
             break;
-        default:
-            dx_mult = 0.0f;     // Stop
-            dy_mult = 0.0f;
+        default:                // Stop
+            cmdX = 0.0f;
+            cmdY = 0.0f;
             break;
     }
+
+    // Rotate command vector by leg base angle to get local step direction
+    // x' = x*cos(θ) - y*sin(θ)
+    // y' = x*sin(θ) + y*cos(θ)
+    float dx_mult = cmdX * cos(baseAngle) - cmdY * sin(baseAngle);
+    float dy_mult = cmdX * sin(baseAngle) + cmdY * cos(baseAngle);
 
 
     switch(currState) {
@@ -118,7 +125,7 @@ void Leg::step(char command) {
         }
 
         case SLIDE: {
-            float t = (stepProgress - 0.5f) - 0.5f;         // Maps [0.5, 1] -> [0,1]
+            float t = (stepProgress - 0.5f) / 0.5f;         // Maps [0.5, 1] -> [0,1]
 
             float x = (1.0f - t) * stepLength;              // Slide backward
             float z = 0.0f;                                 // No lift

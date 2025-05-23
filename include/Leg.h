@@ -17,7 +17,7 @@ enum LegState {
 class Leg {
     public:
         // Constructor
-        Leg();
+        Leg(float aBaseAngle);
 
         // Destructor
         ~Leg();
@@ -41,6 +41,7 @@ class Leg {
 
     private:
         std::array<float, 3> basePosition {0.0f, 0.0f, 0.0f};
+        float baseAngle;
         std::array<float, 3> jointAngles;
         LegState currState;
         LegState nextState;

@@ -1,4 +1,5 @@
 #include "Brain.h"
+#include <cmath>
 
 Brain* brainPtr = nullptr;
 
@@ -12,7 +13,11 @@ void brainCallback() {
 Brain::Brain(GaitType aGaitType)
     : gaitParams(GaitParameters[aGaitType])
 {
-    legs.resize(numLegs);
+    std::vector<float> legAngles = {M_PI/4, 0.0f, -M_PI/4, -M_PI/4, 0.0f, M_PI/4};
+
+    for (int i=0; i<legs.size(); i++) {
+        legs.emplace_back(legAngles[i]);
+    }
     legPhaseOffsets.resize(numLegs);
     legProgress.resize(numLegs, 0.0);
 
@@ -79,7 +84,7 @@ void Brain::updateLegs() {
         legProgress[i] = progress;
 
         if (progress >= legPhaseOffsets[i]) {
-            legs[i].step(0.0); 
+            legs[i].step('W');  // Need to change for WASD input 
         }
     }
 }

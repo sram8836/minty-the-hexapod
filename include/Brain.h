@@ -34,6 +34,7 @@ class Brain {
     private:
         // Members
         BrainState state;
+        std::vector<float> legAngles;
         std::vector<Leg> legs;
         GaitParameterSet gaitParams;
         std::vector<double> legPhaseOffsets;

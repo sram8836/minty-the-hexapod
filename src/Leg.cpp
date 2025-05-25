@@ -9,12 +9,12 @@ Leg::Leg( int index, float mountAngle, StateTransmitter* stateManager )
   stateManager( stateManager )
 {   
     regenerateTrajectory();
-    std::cout << "Leg created at " << mountAngle << std::endl;
+    std::cout << "Leg " << index << " created" << std::endl;
 }
 
 
 Leg::~Leg() {
-    std::cout << "Leg Destroyed!" << std::endl;
+    std::cout << "Leg " << index << " destroyed" << std::endl;
 }
 
 

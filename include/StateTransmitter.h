@@ -18,12 +18,12 @@ class StateTransmitter {
         // Methods
         void updateAngles( int legIndex, std::vector<float> values );
 
+        void sendAngles();
+
     private:
         // Private members
         std::vector<float> servoAngles;
         SerialPort port;
         static const int updateSize = 3;
-
-        // Private Helper Methods
-        void sendAngles();
+        std::mutex servoMutex;
 };

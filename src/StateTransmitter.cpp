@@ -3,7 +3,7 @@
 
 StateTransmitter::StateTransmitter( float txFrequency )
 {   
-    port = SerialPort("/dev/tty.usbmodem14101", B9600);
+    port = SerialPort("/dev/tty.usbmodem14201", B9600);
 
     if (!port.init()) {
         std::cout << "Could not connect to serial." << std::endl;
@@ -11,7 +11,6 @@ StateTransmitter::StateTransmitter( float txFrequency )
     }
 
     servoAngles.resize(18, 0.0f);
-    registerPeriodicCallback(txFrequency, [this]() { this->sendAngles(); });
 
     std::cout << "StateTransmitter Created!" << std::endl;
 }
@@ -25,23 +24,25 @@ StateTransmitter::~StateTransmitter()
 
 // Updates n values (updateSize) in the legIndex-th set of n values
 void StateTransmitter::updateAngles( int legIndex, std::vector<float> values )
-{
+{   
+    std::lock_guard<std::mutex> lock(servoMutex);
+
     for (int i = 0; i < updateSize; i++) {
-        servoAngles[legIndex*updateSize + i] = values[i];
+        this->servoAngles[legIndex*updateSize + i] = values[i];
     }
 }
 
 
 void StateTransmitter::sendAngles()
 {
-    std::cout << "Sending Angles" << std::endl;
-
     std::string cmd = "angles:";
 
-    for (int i = 0; i < servoAngles.size(); i++) {
-        cmd += std::to_string(servoAngles[i]) + ";";
+    std::lock_guard<std::mutex> lock(servoMutex);
+    
+    for (float angle : this->servoAngles) {
+        cmd += std::to_string(angle) + ";";
     }
     
-    cmd[-1] = '\n';
+    if (!cmd.empty()) cmd.back() = '\n';
     port.send(cmd);
 }

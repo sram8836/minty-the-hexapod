@@ -69,7 +69,7 @@ private:
         if (bytes_written != static_cast<ssize_t>(data.size())) {
             std::cerr << "Failed to write complete string ("<< bytes_written << "/" << data.size() << " bytes) to serial port\n";
         } else {
-            std::cout << "Wrote: " << data << std::endl;
+            // std::cout << "Wrote: " << data << std::endl;
         }
     }
 };

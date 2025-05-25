@@ -14,7 +14,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 # Source Files
 set(SOURCES
     src/main.cpp
-    # src/Brain.cpp
+    src/Brain.cpp
     src/Gaits.cpp
     src/Leg.cpp
     src/PeriodicCallback.cpp

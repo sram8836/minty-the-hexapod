@@ -1,54 +1,40 @@
 #pragma once
-
-#include <vector>
+#include <array>
 #include <iostream>
-#include <string>
+#include <cmath>
+#include <fstream>
 #include "Gaits.h"
 #include "Leg.h"
-#include "periodicCallback.h"
+#include "StateTransmitter.h"
+#include "PeriodicCallback.h"
 
-#include <fstream>
-
-enum BrainState {
-    START,
-    MOVE,
-    STOP,
-};
 
 class Brain {
     public:
         // Constructor
-        Brain(GaitType aGaitType = TRIPOD);
+        Brain( GaitType aGaitType = TRIPOD );
 
         // Destructor
         ~Brain();
 
         // Methods
-        void inputGait();
-        void registerTouch(int leg); // Callback for when sensor of specific leg touches ground
-        void updateState(BrainState newState);
-        void checkLegs(); // Check if legs functioning properly
-        void viewHexapod(); // For debugging
-        void update(); // Called periodically by callback
+        void updateVelocity( float forwardVel, float lateralVel, float rotationalVel );
 
     private:
-        // Members
-        BrainState state;
-        std::vector<float> legAngles;
-        std::vector<Leg> legs;
-        GaitParameterSet gaitParams;
-        std::vector<double> legPhaseOffsets;
-        std::vector<double> legProgress;
-
-        const int callbackPeriod = 10; // milliseconds
-
-        // Helpers
-        void updateLegs();
-        void setGait(GaitType aNewGaitType);
-        void resyncLegs();
+        // Constants
+        const float updateFrequency = 30.0f;
+        const std::vector<float> legConfig = {
+            -M_PI/4, M_PI/4, M_PI/2, -M_PI/2, -3*M_PI/4, 3*M_PI/4};
         
-        std::ofstream syncLog;
-        int tickCount = 0;
-        void logSyncData(); // for CSV leg progress
+        // Variables
+        std::vector<Leg*> legs;
+        GaitParameterSet gaitParams;
+        StateTransmitter* stateManager;
+        float linearMag;
+        float linearAngle;
+        float rotationalVel;
+        float centralStepPercent;
 
+        // Methods
+        void updateLegs();
 };

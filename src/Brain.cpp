@@ -1,96 +1,83 @@
 #include "Brain.h"
-#include <cmath>
 
 
 // Constructor
-Brain::Brain(GaitType aGaitType)
-    : gaitParams(GaitParameters[aGaitType])
-{
-    std::vector<float> legAngles = {M_PI/4, 0.0f, -M_PI/4, -M_PI/4, 0.0f, M_PI/4};
+Brain::Brain( GaitType aGaitType )
+: linearMag ( 0.0f ),
+  linearAngle ( 0.0f ),
+  rotationalVel ( 0.0f ),
+  centralStepPercent ( 0.0f ),
+  gaitParams(GaitParameters[aGaitType])
+{   
+    // Create state transmitter
+    stateManager = new StateTransmitter();
 
-    StateTransmitter txr = StateTransmitter();
-    Leg leg = Leg(0, -M_PI/4, &txr);
-
-    for (int i=0; i<legAngles.size(); i++) {
-        legs.emplace_back(legAngles[i]);
-    }
-    legPhaseOffsets.resize(numLegs);
-    legProgress.resize(numLegs, 0.0);
-
-    for (int i = 0; i < numLegs; ++i) {
-        legPhaseOffsets[i] = (gaitParams.legSequence[i] * gaitParams.phaseDelay) / 360.0;
+    // Create leg objects
+    for (int i=0; i<legConfig.size(); i++) {
+        legs.push_back(new Leg(i, legConfig[i], stateManager));
     }
 
-    std::cout << "Brain Created!" << std::endl;
+    registerPeriodicCallback(updateFrequency, [this]() { this->updateLegs(); });
+
+    std::cout << "Brain created" << std::endl;
 }
 
 
-// Destructor
 Brain::~Brain() {
-    std::cout << "Brain Destroyed!" << std::endl;
-}
 
-
-void Brain::setGait(GaitType aNewGaitType) {
-    std::cout << "Setting Gait as Type " << aNewGaitType << std::endl;
-    this->gaitParams = GaitParameters[aNewGaitType];
-
-    for (int i = 0; i < numLegs; ++i) {
-        legPhaseOffsets[i] = (gaitParams.legSequence[i] * gaitParams.phaseDelay) / 360.0;
+    for (Leg* leg : legs) {
+        delete leg;
     }
-}
 
-void Brain::viewHexapod() {
-    std::cout << "Visualising Hexapod" << std::endl;
-}
-
-
-void Brain::inputGait() {
-    std::cout << "Input Gait: TRIPOD(0), WAVE(1): ";
-    int g;
-    std::cin >> g;
-
-    if (g == 0) setGait(TRIPOD);
-    else if (g == 1) setGait(WAVE);
-    else std::cout << "Invalid gait\n";
+    std::cout << "Brain destroyed" << std::endl;
 }
 
 
-void Brain::registerTouch(int leg) {
-    std::cout << "Touch registered on leg " << leg << std::endl;
-}
+void Brain::updateLegs() {
 
+    // Advance stepPercent according to velocity and previous stepPercent
+    centralStepPercent += 1.0f; // time_step_size = total_duration / number_of_updates
+    centralStepPercent = centralStepPercent > 100.0f ? centralStepPercent - 100.0f : centralStepPercent;
+    
+    // Update legs according to gait parameters
+    for (int i = 0; i<legs.size(); i += gaitParams.legsPerStep) {
 
-void Brain::update() {
-    updateLegs();
-    resyncLegs();
-}
+        float movement_index = i / gaitParams.legsPerStep;
+        float stepPercent = centralStepPercent + 100.0f*movement_index*(gaitParams.phaseDelay/360.0f);
+        stepPercent = stepPercent > 100.0f ? stepPercent - 100.0f : stepPercent;
 
-// void Brain::updateLegs() {
-//     for (int i = 0; i < numLegs; ++i) {
-//         // double progress = legs[i].getStepProgress(); // returns 0.0 to 1.0
-//         // legProgress[i] = progress;
-
-//         // if (progress >= legPhaseOffsets[i]) {
-//             // legs[i].step('W');  // Need to change for WASD input 
-//         }
-//     }
-// }
-
-
-void Brain::resyncLegs() {
-    double avg = 0.0;
-    for (double p : legProgress) avg += p;
-    avg /= numLegs;
-
-    for (int i = 0; i < numLegs; ++i) {
-        double error = legProgress[i] - avg;
-
-        if (std::abs(error) > 0.05) {
-            legPhaseOffsets[i] -= 0.5 * error;
-
-            if (legPhaseOffsets[i] < 0) legPhaseOffsets[i] += 1.0;
-            if (legPhaseOffsets[i] > 1) legPhaseOffsets[i] -= 1.0;
+        for (int j = 0; j<gaitParams.legsPerStep; j++) {
+            int legIndex = gaitParams.legSequence[i + j];
+            legs[legIndex]->setStepPercent(stepPercent);
         }
+    }
+
+    // TODO: implement duty cycle logic
+
+    stateManager->sendAngles();
+}
+
+
+void Brain::updateVelocity( float forwardVel, float lateralVel, float rotationalVel ) {
+
+    // Calculate sum angle and magnitude of linear velocities 
+    float linearMag = std::sqrt(forwardVel * forwardVel + lateralVel * lateralVel);
+    float linearAngle = std::atan2(-lateralVel, forwardVel);
+
+    // Update leg trajectory if changed
+    if (this->linearAngle != linearAngle) {
+        this->linearAngle = linearAngle;
+        
+        for (int i = 0; i<legs.size(); i++) {
+            legs[i]->setStepAngle(linearAngle);
+        }
+    }
+
+    if (this->linearMag != linearMag) {
+        // TODO
+    }
+
+    if (this->rotationalVel != rotationalVel) {
+        // TODO
     }
 }

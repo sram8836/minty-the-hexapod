@@ -14,13 +14,11 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 # Source Files
 set(SOURCES
     src/main.cpp
-    src/Brain.cpp
+    # src/Brain.cpp
     src/Gaits.cpp
-    src/InverseKinematics.cpp
     src/Leg.cpp
-    src/InverseKinematics.cpp
-    src/periodicCallback.cpp
-    src/ServoDriver.cpp
+    src/PeriodicCallback.cpp
+    src/StateTransmitter.cpp
 )
 
 # Add Executable

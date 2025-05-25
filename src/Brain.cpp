@@ -1,19 +1,15 @@
 #include "Brain.h"
 #include <cmath>
 
-Brain* brainPtr = nullptr;
-
-void brainCallback() {
-    if (brainPtr) {
-        brainPtr->update();
-    }
-}
 
 // Constructor
 Brain::Brain(GaitType aGaitType)
     : gaitParams(GaitParameters[aGaitType])
 {
     std::vector<float> legAngles = {M_PI/4, 0.0f, -M_PI/4, -M_PI/4, 0.0f, M_PI/4};
+
+    StateTransmitter txr = StateTransmitter();
+    Leg leg = Leg(0, -M_PI/4, &txr);
 
     for (int i=0; i<legAngles.size(); i++) {
         legs.emplace_back(legAngles[i]);
@@ -25,22 +21,15 @@ Brain::Brain(GaitType aGaitType)
         legPhaseOffsets[i] = (gaitParams.legSequence[i] * gaitParams.phaseDelay) / 360.0;
     }
 
-    std::thread loopThread(registerPeriodicCallback, callbackPeriod, brainCallback);
-    loopThread.detach(); //avoid blocking the constructor
-
-    brainPtr = this;
-
     std::cout << "Brain Created!" << std::endl;
 }
+
 
 // Destructor
 Brain::~Brain() {
     std::cout << "Brain Destroyed!" << std::endl;
 }
 
-void Brain::updateState(BrainState newState) {
-    state = newState;
-}
 
 void Brain::setGait(GaitType aNewGaitType) {
     std::cout << "Setting Gait as Type " << aNewGaitType << std::endl;
@@ -55,6 +44,7 @@ void Brain::viewHexapod() {
     std::cout << "Visualising Hexapod" << std::endl;
 }
 
+
 void Brain::inputGait() {
     std::cout << "Input Gait: TRIPOD(0), WAVE(1): ";
     int g;
@@ -65,29 +55,28 @@ void Brain::inputGait() {
     else std::cout << "Invalid gait\n";
 }
 
+
 void Brain::registerTouch(int leg) {
     std::cout << "Touch registered on leg " << leg << std::endl;
 }
 
-void Brain::checkLegs() {
-    std::cout << "Checking legs for fault..." << std::endl;
-}
 
 void Brain::update() {
     updateLegs();
     resyncLegs();
 }
 
-void Brain::updateLegs() {
-    for (int i = 0; i < numLegs; ++i) {
-        double progress = legs[i].getStepProgress(); // returns 0.0 to 1.0
-        legProgress[i] = progress;
+// void Brain::updateLegs() {
+//     for (int i = 0; i < numLegs; ++i) {
+//         // double progress = legs[i].getStepProgress(); // returns 0.0 to 1.0
+//         // legProgress[i] = progress;
 
-        if (progress >= legPhaseOffsets[i]) {
-            // legs[i].step('W');  // Need to change for WASD input 
-        }
-    }
-}
+//         // if (progress >= legPhaseOffsets[i]) {
+//             // legs[i].step('W');  // Need to change for WASD input 
+//         }
+//     }
+// }
+
 
 void Brain::resyncLegs() {
     double avg = 0.0;

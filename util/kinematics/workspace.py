@@ -6,7 +6,7 @@ from mpl_toolkits.mplot3d import Axes3D
 mode = "2D"  # 2D/3D
 
 if mode.upper() == "2D":
-    points = 300
+    points = 200
 else:
     points = 20
 
@@ -63,7 +63,7 @@ def plot_3d_workspace(X, Y, Z):
     ax.set_zlabel("Z (mm)")
     ax.set_xlim([-300, 300])
     ax.set_ylim([-300, 300])
-    ax.set_zlim([0, Z.max() + 20])
+    ax.set_zlim([Z.min() - 20, Z.max() + 20])
     ax.view_init(elev=30, azim=135)
     ax.legend()
     plt.show()

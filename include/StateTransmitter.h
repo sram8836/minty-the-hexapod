@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <array>
+#include <mutex>
 #include "PeriodicCallback.h"
 #include "SerialPort.h"
 

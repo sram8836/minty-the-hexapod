@@ -16,9 +16,9 @@ L1 = 80
 L2 = 134
 
 # joint angle ranges (degrees converted to radians)
-theta1_range = np.radians(np.linspace(-45, 45, 20))  # joint 1
-theta2_range = np.radians(np.linspace(0, 90, points))    # joint 2
-theta3_range = np.radians(np.linspace(-90, 0, points))   # joint 3
+theta1_range = np.radians(np.linspace(-30, 30, 20))  # joint 1
+theta2_range = np.radians(np.linspace(-90, 60, points))    # joint 2
+theta3_range = np.radians(np.linspace(-90, 65, points))   # joint 3
 
 def compute_workspace():
     X, Y, Z = [], [], []

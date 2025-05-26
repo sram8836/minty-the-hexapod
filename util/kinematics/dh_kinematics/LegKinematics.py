@@ -5,7 +5,7 @@ import random
 import sys
 from constants import standardDhTable
 from scipy.spatial.transform import Rotation as R
-from util import isCommandLineArgument, getAnglesFromFile, rotationVectorToMatrix
+from util import isCommandLineArgument, getAnglesFromFile
 
 
 if __name__ == "__main__":

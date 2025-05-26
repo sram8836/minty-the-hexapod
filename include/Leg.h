@@ -2,8 +2,8 @@
 #include <iostream>
 #include <array>
 #include <fstream>
+#include "math.h"
 #include "StateTransmitter.h"
-
 
 class Leg {
     public:
@@ -17,6 +17,8 @@ class Leg {
         void setStepAngle( float angle );
 
         void setStepPercent( float stepPercent );
+
+        std::vector<float> solveInverseKinematics(float x, float y, float z);
 
         void saveTrajectory();
 
@@ -44,8 +46,6 @@ class Leg {
 
         // Methods
         void regenerateTrajectory();
-
-        std::vector<float> solveInverseKinematics(float x, float y, float z);
 
         void updateJointAngles();
 

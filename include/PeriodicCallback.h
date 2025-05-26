@@ -2,6 +2,7 @@
 #include <thread>
 #include <chrono>
 #include <atomic>
+#include <functional>
 
 using CallbackFunction = std::function<void()>;
 

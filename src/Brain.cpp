@@ -3,7 +3,7 @@
 
 // Constructor
 Brain::Brain( GaitType aGaitType )
-: linearMag ( 0.0f ),
+: linearMag ( 100.0f ),
   linearAngle ( 0.0f ),
   rotationalVel ( 0.0f ),
   centralStepPercent ( 0.0f ),
@@ -17,9 +17,14 @@ Brain::Brain( GaitType aGaitType )
         legs.push_back(new Leg(i, legConfig[i], stateManager));
     }
 
-    registerPeriodicCallback(updateFrequency, [this]() { this->updateLegs(); });
-
+    timer = new PeriodicCallback(updateFrequency, [this]() { this->updateLegs(); });
     std::cout << "Brain created" << std::endl;
+
+    while (1) {
+        int sleep_duration = static_cast<int>(1000.0f / updateFrequency);
+        std::this_thread::sleep_for(std::chrono::milliseconds(sleep_duration));
+        updateLegs();
+    }
 }
 
 
@@ -29,6 +34,7 @@ Brain::~Brain() {
         delete leg;
     }
 
+    delete timer;
     std::cout << "Brain destroyed" << std::endl;
 }
 
@@ -36,10 +42,11 @@ Brain::~Brain() {
 void Brain::updateLegs() {
 
     // Advance stepPercent according to velocity and previous stepPercent
-    centralStepPercent += 1.0f; // time_step_size = total_duration / number_of_updates
+    centralStepPercent += 1.0f;
+    // centralStepPercent += (2.0f*linearMag) / (stepLength*updateFrequency);
     centralStepPercent = centralStepPercent > 100.0f ? centralStepPercent - 100.0f : centralStepPercent;
     
-    // Update legs according to gait parameters
+    // Update legs according to gait paramupdateFrequencyeters
     for (int i = 0; i<legs.size(); i += gaitParams.legsPerStep) {
 
         float movement_index = i / gaitParams.legsPerStep;
@@ -63,6 +70,7 @@ void Brain::updateVelocity( float forwardVel, float lateralVel, float rotational
     // Calculate sum angle and magnitude of linear velocities 
     float linearMag = std::sqrt(forwardVel * forwardVel + lateralVel * lateralVel);
     float linearAngle = std::atan2(-lateralVel, forwardVel);
+    this->linearMag = linearMag;
 
     // Update leg trajectory if changed
     if (this->linearAngle != linearAngle) {
@@ -71,10 +79,6 @@ void Brain::updateVelocity( float forwardVel, float lateralVel, float rotational
         for (int i = 0; i<legs.size(); i++) {
             legs[i]->setStepAngle(linearAngle);
         }
-    }
-
-    if (this->linearMag != linearMag) {
-        // TODO
     }
 
     if (this->rotationalVel != rotationalVel) {

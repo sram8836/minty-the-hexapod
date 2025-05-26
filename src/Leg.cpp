@@ -4,7 +4,7 @@
 Leg::Leg( int index, float mountAngle, StateTransmitter* stateManager )
 : index( index ),
   mountAngle( mountAngle ),
-  stepAngle ( 0.0f ),
+  stepAngle ( degToRad(45.0f) ),
   stepPercent ( 0.0f ),
   stateManager( stateManager )
 {   
@@ -34,12 +34,14 @@ void Leg::setStepPercent( float stepPercent ) {
 
 void Leg::regenerateTrajectory() {
     float x, y, z;
+    float angle = -mountAngle - stepAngle;
+    std::cout << "Stepping at: " << radToDeg(mountAngle) << " + " << radToDeg(stepAngle) << " = " << radToDeg(angle) << std::endl;
 
     // Half Slide 1
     for (int i = 0; i <= numSamples/4; ++i) {
         float t = static_cast<float>(i) / (numSamples/2); // t in (-0.5, 0)
-        x = xNom - (t)*stepLength*std::sin(-mountAngle);
-        y = yNom - (t)*stepLength*std::cos(-mountAngle);
+        x = xNom - (t)*stepLength*std::sin(angle);
+        y = yNom - (t)*stepLength*std::cos(angle);
         z = zNom;
         trajectory.emplace_back(x, y, z);
     }
@@ -47,8 +49,8 @@ void Leg::regenerateTrajectory() {
     // Swing
     for (int i = 0; i <= numSamples/2; ++i) {
         float t = static_cast<float>(i) / (numSamples/2); // t in (-0.5, 0.5)
-        x = xNom + (t-0.5)*stepLength*std::sin(-mountAngle);
-        y = yNom + (t-0.5)*stepLength*std::cos(-mountAngle);
+        x = xNom + (t-0.5)*stepLength*std::sin(angle);
+        y = yNom + (t-0.5)*stepLength*std::cos(angle);
         z = zNom + 4 * 50 * t * (1 - t); // Parabola
         trajectory.emplace_back(x, y, z);
     }
@@ -56,8 +58,8 @@ void Leg::regenerateTrajectory() {
     // Half Slide 2
     for (int i = 0; i <= numSamples/4; ++i) {
         float t = static_cast<float>(i) / (numSamples/2); // t in (0, 0.5)
-        x = xNom + (0.5-t)*stepLength*std::sin(-mountAngle);
-        y = yNom + (0.5-t)*stepLength*std::cos(-mountAngle);
+        x = xNom + (0.5-t)*stepLength*std::sin(angle);
+        y = yNom + (0.5-t)*stepLength*std::cos(angle);
         z = zNom;
         trajectory.emplace_back(x, y, z);
     }

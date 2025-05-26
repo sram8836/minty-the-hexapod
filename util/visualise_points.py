@@ -15,6 +15,21 @@ def load_points_from_csv(filename):
                 print(f"Skipping invalid row: {row}")
     return points
 
+def set_equal_axes(ax, xs, ys, zs):
+    max_range = max(
+        max(xs) - min(xs),
+        max(ys) - min(ys),
+        max(zs) - min(zs)
+    ) / 2.0
+
+    mid_x = (max(xs) + min(xs)) / 2.0
+    mid_y = (max(ys) + min(ys)) / 2.0
+    mid_z = min(zs)
+
+    ax.set_xlim(mid_x - max_range, mid_x + max_range)
+    ax.set_ylim(mid_y - max_range, mid_y + max_range)
+    ax.set_zlim(mid_z, mid_z + 2*max_range)
+
 def plot_points_with_lines(points):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
@@ -28,21 +43,18 @@ def plot_points_with_lines(points):
     ax.plot(xs[26:-26], ys[26:-26], zs[26:-26], color='blue')
 
     # Plot second halfslide
-    ax.plot(xs[-26:], ys[-26:], zs[-26:], color = 'green')
+    ax.plot(xs[-26:], ys[-26:], zs[-26:], color='green')
 
-    # Plot starting point
+    # Plot key points
     ax.plot(xs[0], ys[0], zs[0], color='red', marker='o')
-
-    # Plot change point 1
     ax.plot(xs[26], ys[26], zs[26], color='blue', marker='o')
-
-    # Plot change point 2
     ax.plot(xs[-26], ys[-26], zs[-26], color='green', marker='o')
-
-    # Plot ending point
     ax.plot(xs[-1], ys[-1], zs[-1], color='black', marker='x')
 
-    # Labels and axes limits (optional)
+    # Set equal aspect ratio for all axes
+    set_equal_axes(ax, xs, ys, zs)
+
+    # Labels
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
     ax.set_zlabel('Z')

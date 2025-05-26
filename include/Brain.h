@@ -22,7 +22,8 @@ class Brain {
 
     private:
         // Constants
-        const float updateFrequency = 30.0f;
+        const float updateFrequency = 10.0f;
+        const float stepLength = 100.0f;
         const std::vector<float> legConfig = {
             -M_PI/4, M_PI/4, M_PI/2, -M_PI/2, -3*M_PI/4, 3*M_PI/4};
         
@@ -30,6 +31,7 @@ class Brain {
         std::vector<Leg*> legs;
         GaitParameterSet gaitParams;
         StateTransmitter* stateManager;
+        PeriodicCallback* timer;
         float linearMag;
         float linearAngle;
         float rotationalVel;

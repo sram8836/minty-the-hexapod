@@ -4,7 +4,8 @@
 Leg::Leg( int index, float mountAngle, StateTransmitter* stateManager )
 : index( index ),
   mountAngle( mountAngle ),
-  stepAngle ( degToRad(180.0f) ),
+  stepSize( 0.0f ),
+  stepAngle ( 0.0f ),
   stepPercent ( 0.0f ),
   stateManager( stateManager )
 {   
@@ -21,6 +22,14 @@ Leg::~Leg() {
 void Leg::setStepAngle( float angle )
 {
     stepAngle = angle;
+    regenerateTrajectory();
+    updateJointAngles();
+}
+
+
+void Leg::setStepSize( float size )
+{   
+    stepSize = size;
     regenerateTrajectory();
     updateJointAngles();
 }
@@ -44,12 +53,13 @@ void Leg::regenerateTrajectory() {
     float x, y, z;
     float angle = mountAngle - stepAngle;
     float flip = getFlipFactor();
-    
+    trajectory.clear();
+
     // Half Slide 1
     for (int i = 0; i <= numSamples/4; ++i) {
         float t = static_cast<float>(i) / (numSamples/2); // t in (-0.5, 0)
-        x = xNom - flip*t*stepLength*std::sin(angle);
-        y = yNom - flip*t*stepLength*std::cos(angle);
+        x = xNom - flip*t*stepSize*std::sin(angle);
+        y = yNom - flip*t*stepSize*std::cos(angle);
         z = zNom;
         trajectory.emplace_back(x, y, z);
     }
@@ -57,17 +67,17 @@ void Leg::regenerateTrajectory() {
     // Swing
     for (int i = 0; i <= numSamples/2; ++i) {
         float t = static_cast<float>(i) / (numSamples/2); // t in (-0.5, 0.5)
-        x = xNom + flip*(t-0.5)*stepLength*std::sin(angle);
-        y = yNom + flip*(t-0.5)*stepLength*std::cos(angle);
-        z = zNom + 4 * 50 * t * (1 - t); // Parabola
+        x = xNom + flip*(t-0.5)*stepSize*std::sin(angle);
+        y = yNom + flip*(t-0.5)*stepSize*std::cos(angle);
+        z = zNom + 4 * (stepSize/2) * t * (1 - t); // Parabola
         trajectory.emplace_back(x, y, z);
     }
 
     // Half Slide 2
     for (int i = 0; i <= numSamples/4; ++i) {
         float t = static_cast<float>(i) / (numSamples/2); // t in (0, 0.5)
-        x = xNom + flip*(0.5-t)*stepLength*std::sin(angle);
-        y = yNom + flip*(0.5-t)*stepLength*std::cos(angle);
+        x = xNom + flip*(0.5-t)*stepSize*std::sin(angle);
+        y = yNom + flip*(0.5-t)*stepSize*std::cos(angle);
         z = zNom;
         trajectory.emplace_back(x, y, z);
     }

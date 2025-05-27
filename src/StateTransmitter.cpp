@@ -24,7 +24,7 @@ StateTransmitter::~StateTransmitter()
 
 // Updates n values (updateSize) in the legIndex-th set of n values
 void StateTransmitter::updateAngles( int legIndex, std::vector<float> values )
-{   
+{       
     std::lock_guard<std::mutex> lock(servoMutex);
 
     for (int i = 0; i < updateSize; i++) {

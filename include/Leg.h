@@ -16,6 +16,8 @@ class Leg {
         // Methods
         void setStepAngle( float angle );
 
+        void setStepSize( float size );
+
         void setStepPercent( float stepPercent );
 
         std::vector<float> solveInverseKinematics(float x, float y, float z);
@@ -28,7 +30,6 @@ class Leg {
         const float xNom = 180.0f; // mm
         const float yNom = 0.0f; // mm
         const float zNom = -70.0f; // mm
-        const float stepLength = 100.0f; // mm
 
         // DH parameters
         const float l1 = 43.0f;  // mm L1: Coxa
@@ -40,6 +41,7 @@ class Leg {
         int index;
         float mountAngle;
         float stepAngle;
+        float stepSize;
         float stepPercent;
         std::vector<std::tuple<float, float, float>> trajectory;
         StateTransmitter* stateManager;

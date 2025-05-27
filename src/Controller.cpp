@@ -1,22 +1,29 @@
 #include "Controller.h"
 
-constexpr float VELOCITY_INCREMENT = 0.01f;
 
 Controller::Controller()
 : forwardVel(0.0f), lateralVel(0.0f), rotationalVel(0.0f), running(true)
-{
+{   
+    std::cout << "Controller created" << std::endl;
     inputThread = std::thread(&Controller::inputLoop, this);
 }
+
 
 Controller::~Controller() {
     running = false;
     if (inputThread.joinable())
+    {
         inputThread.join();
+    }
+    
+    std::cout << "Controller destroyed" << std::endl;
 }
+
 
 std::tuple<float, float, float> Controller::getVelocities() const {
     return {forwardVel.load(), lateralVel.load(), rotationalVel.load()};
 }
+
 
 // stdin to non-blocking
 void Controller::inputLoop() {
@@ -33,33 +40,65 @@ void Controller::inputLoop() {
         char ch;
         if (read(STDIN_FILENO, &ch, 1) > 0) {
             switch (ch) {
-                case 'w': case 'W':
-                    forwardVel.store(forwardVel.load() + VELOCITY_INCREMENT);
-                    break;
                 case 's': case 'S':
                     forwardVel.store(0.0f);
                     lateralVel.store(0.0f);
                     rotationalVel.store(0.0f);
+                    printVelocities();
                     break;
-                case 'z': case 'Z':
-                    forwardVel.store(forwardVel.load() - VELOCITY_INCREMENT);
+                case 'w': case 'W': {
+                    if (lateralVel.load() < LINEAR_VEL_LIMIT) {
+                            forwardVel.store(forwardVel.load() + LINEAR_INCREMENT);
+                        }
+                    }
+                    printVelocities();
                     break;
-                case 'a': case 'A':
-                    lateralVel.store(lateralVel.load() + VELOCITY_INCREMENT);
+                case 'z': case 'Z': {
+                    if (lateralVel.load() > -LINEAR_VEL_LIMIT) {
+                            forwardVel.store(forwardVel.load() - LINEAR_INCREMENT);
+                        }
+                    }
+                    printVelocities();
                     break;
-                case 'd': case 'D':
-                    lateralVel.store(lateralVel.load() - VELOCITY_INCREMENT);
+                case 'a': case 'A': {
+                    if (lateralVel.load() < LINEAR_VEL_LIMIT) {
+                            lateralVel.store(lateralVel.load() + LINEAR_INCREMENT);
+                        }
+                    }
+                    printVelocities();
                     break;
-                case 'q': case 'Q':
-                    rotationalVel.store(rotationalVel.load() + VELOCITY_INCREMENT);
+                case 'd': case 'D': {
+                    if (lateralVel.load() > -LINEAR_VEL_LIMIT) {
+                            lateralVel.store(lateralVel.load() - LINEAR_INCREMENT);
+                        }
+                    }
+                    printVelocities();
                     break;
-                case 'e': case 'E':
-                    rotationalVel.store(rotationalVel.load() - VELOCITY_INCREMENT);
+                case 'q': case 'Q': {
+                    if (rotationalVel.load() < ROTATIONAL_VEL_LIMIT) {
+                            rotationalVel.store(rotationalVel.load() + ROTATIONAL_INCREMENT);
+                        }
+                    }
+                    printVelocities();
+                    break;
+                case 'e': case 'E': {
+                    if (rotationalVel.load() > -ROTATIONAL_VEL_LIMIT) {
+                            rotationalVel.store(rotationalVel.load() - ROTATIONAL_INCREMENT);
+                        }
+                    }
+                    printVelocities();
                     break;
             }
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(std::chrono::milliseconds(sleepDuration));
     }
 
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);    // restore terminal
+}
+
+void Controller::printVelocities() {
+
+    std::cout << "Forward velocity: " << forwardVel.load()
+        << ", lateral velocity: " << lateralVel.load()
+        << ", rotational velocity: " << rotationalVel.load() << std::endl;
 }

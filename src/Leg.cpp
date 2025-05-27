@@ -4,7 +4,7 @@
 Leg::Leg( int index, float mountAngle, StateTransmitter* stateManager )
 : index( index ),
   mountAngle( mountAngle ),
-  stepAngle ( degToRad(45.0f) ),
+  stepAngle ( degToRad(-90.0f) ),
   stepPercent ( 0.0f ),
   stateManager( stateManager )
 {   
@@ -32,16 +32,24 @@ void Leg::setStepPercent( float stepPercent ) {
 }
 
 
+float Leg::getFlipFactor()
+{
+    int isLeft = index == 0 || index == 3 || index == 4;
+    int isRight = index == 1 || index == 2 || index == 5;
+    return static_cast<float>(isRight - isLeft);
+}
+
+
 void Leg::regenerateTrajectory() {
     float x, y, z;
-    float angle = -mountAngle - stepAngle;
-    std::cout << "Stepping at: " << radToDeg(mountAngle) << " + " << radToDeg(stepAngle) << " = " << radToDeg(angle) << std::endl;
-
+    float angle = mountAngle - stepAngle;
+    float flip = getFlipFactor();
+    
     // Half Slide 1
     for (int i = 0; i <= numSamples/4; ++i) {
         float t = static_cast<float>(i) / (numSamples/2); // t in (-0.5, 0)
-        x = xNom - (t)*stepLength*std::sin(angle);
-        y = yNom - (t)*stepLength*std::cos(angle);
+        x = xNom - flip*t*stepLength*std::sin(angle);
+        y = yNom - flip*t*stepLength*std::cos(angle);
         z = zNom;
         trajectory.emplace_back(x, y, z);
     }
@@ -49,8 +57,8 @@ void Leg::regenerateTrajectory() {
     // Swing
     for (int i = 0; i <= numSamples/2; ++i) {
         float t = static_cast<float>(i) / (numSamples/2); // t in (-0.5, 0.5)
-        x = xNom + (t-0.5)*stepLength*std::sin(angle);
-        y = yNom + (t-0.5)*stepLength*std::cos(angle);
+        x = xNom + flip*(t-0.5)*stepLength*std::sin(angle);
+        y = yNom + flip*(t-0.5)*stepLength*std::cos(angle);
         z = zNom + 4 * 50 * t * (1 - t); // Parabola
         trajectory.emplace_back(x, y, z);
     }
@@ -58,8 +66,8 @@ void Leg::regenerateTrajectory() {
     // Half Slide 2
     for (int i = 0; i <= numSamples/4; ++i) {
         float t = static_cast<float>(i) / (numSamples/2); // t in (0, 0.5)
-        x = xNom + (0.5-t)*stepLength*std::sin(angle);
-        y = yNom + (0.5-t)*stepLength*std::cos(angle);
+        x = xNom + flip*(0.5-t)*stepLength*std::sin(angle);
+        y = yNom + flip*(0.5-t)*stepLength*std::cos(angle);
         z = zNom;
         trajectory.emplace_back(x, y, z);
     }
@@ -121,5 +129,5 @@ std::vector<float> Leg::solveInverseKinematics(float x, float y, float z) {
     float k2 = l3 * std::sin(theta3 - ELBOW_OFFSET_RAD);
     float theta2 = std::atan2(z1, x1) - std::atan2(k2, k1) + SHOULDER_OFFSET_RAD;
 
-    return {radToDeg(theta1), radToDeg(theta2), radToDeg(-theta3)};
+    return {radToDeg(-theta3), radToDeg(theta2), radToDeg(theta1)};
 }

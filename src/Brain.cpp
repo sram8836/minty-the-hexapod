@@ -3,8 +3,8 @@
 
 // Constructor
 Brain::Brain( GaitType aGaitType )
-: linearMag ( 100.0f ),
-  linearAngle ( 0.0f ),
+: linearMag ( 0.0f ),
+  linearAngle ( 0.0f*M_PI ),
   rotationalVel ( 0.0f ),
   centralStepPercent ( 0.0f ),
   gaitParams(GaitParameters[aGaitType])

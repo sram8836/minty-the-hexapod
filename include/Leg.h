@@ -25,9 +25,9 @@ class Leg {
     private:
         // Variables
         const float numSamples = 100; // Hz
-        const float xNom = 100.0f; // mm
+        const float xNom = 180.0f; // mm
         const float yNom = 0.0f; // mm
-        const float zNom = -100.0f; // mm
+        const float zNom = -70.0f; // mm
         const float stepLength = 100.0f; // mm
 
         // DH parameters
@@ -35,7 +35,7 @@ class Leg {
         const float l2 = 80.0f;  // mm L2: Femur
         const float l3 = 134.0f; // mm L3: Tibia
         const float SHOULDER_OFFSET_RAD = degToRad(-45.0f); // theta2
-        const float ELBOW_OFFSET_RAD = degToRad(135.0f);    // theta3
+        const float ELBOW_OFFSET_RAD = degToRad(90.0f);    // theta3
 
         int index;
         float mountAngle;
@@ -52,4 +52,6 @@ class Leg {
         float radToDeg(float radians) { return radians * (180.0 / M_PI); };
 
         float degToRad(float degrees) { return degrees * (M_PI / 180.0); };
+
+        float getFlipFactor();
 };

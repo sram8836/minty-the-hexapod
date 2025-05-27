@@ -3,7 +3,7 @@
 
 StateTransmitter::StateTransmitter( float txFrequency )
 {   
-    port = SerialPort("/dev/tty.usbmodem14201", B9600);
+    port = SerialPort("/dev/tty.usbmodem14301", B9600);
 
     if (!port.init()) {
         std::cout << "Could not connect to serial." << std::endl;
@@ -39,7 +39,7 @@ void StateTransmitter::sendAngles()
 
     std::lock_guard<std::mutex> lock(servoMutex);
     
-    for (float angle : this->servoAngles) {
+    for (float angle : servoAngles) {
         cmd += std::to_string(angle) + ";";
     }
     

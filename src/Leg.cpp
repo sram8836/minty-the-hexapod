@@ -4,7 +4,7 @@
 Leg::Leg( int index, float mountAngle, StateTransmitter* stateManager )
 : index( index ),
   mountAngle( mountAngle ),
-  stepAngle ( degToRad(-90.0f) ),
+  stepAngle ( degToRad(180.0f) ),
   stepPercent ( 0.0f ),
   stateManager( stateManager )
 {   
@@ -33,7 +33,7 @@ void Leg::setStepPercent( float stepPercent ) {
 
 
 float Leg::getFlipFactor()
-{
+{   
     int isLeft = index == 0 || index == 3 || index == 4;
     int isRight = index == 1 || index == 2 || index == 5;
     return static_cast<float>(isRight - isLeft);

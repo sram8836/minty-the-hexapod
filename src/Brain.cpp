@@ -80,8 +80,4 @@ void Brain::updateVelocity( float forwardVel, float lateralVel, float rotational
             legs[i]->setStepAngle(linearAngle);
         }
     }
-
-    if (this->rotationalVel != rotationalVel) {
-        // TODO
-    }
 }

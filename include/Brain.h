@@ -7,7 +7,7 @@
 #include "Leg.h"
 #include "StateTransmitter.h"
 #include "PeriodicCallback.h"
-
+#include "Controller.h"
 
 class Brain {
     public:
@@ -41,4 +41,6 @@ class Brain {
         void updateLegs();
 
         float getTurnFactor( int legIndex );
+
+        Controller controller;
 };

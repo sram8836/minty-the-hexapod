@@ -19,6 +19,7 @@ set(SOURCES
     src/Leg.cpp
     src/PeriodicCallback.cpp
     src/StateTransmitter.cpp
+    src/Controller.cpp
 )
 
 # Add Executable

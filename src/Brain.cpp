@@ -1,6 +1,5 @@
 #include "Brain.h"
 
-
 // Constructor
 Brain::Brain( GaitType aGaitType )
 : linearMag ( 0.0f ),
@@ -8,7 +7,7 @@ Brain::Brain( GaitType aGaitType )
   rotationalVel ( 0.0f ),
   centralStepPercent ( 0.0f ),
   gaitParams(GaitParameters[aGaitType])
-{   
+{
     // Create state transmitter
     stateManager = new StateTransmitter();
 
@@ -20,11 +19,13 @@ Brain::Brain( GaitType aGaitType )
     timer = new PeriodicCallback(updateFrequency, [this]() { this->updateLegs(); });
     std::cout << "Brain created" << std::endl;
 
-    while (1) {
-        int sleep_duration = static_cast<int>(1000.0f / updateFrequency);
-        std::this_thread::sleep_for(std::chrono::milliseconds(sleep_duration));
-        updateLegs();
+    while (true) {
+        float f, l, r;
+        std::tie(f, l, r) = controller.getVelocities();
+        updateVelocity(f, l, r);
+        std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(1000.0f / updateFrequency)));
     }
+
 }
 
 

@@ -60,14 +60,14 @@ void Controller::inputLoop() {
                     }
                     printVelocities();
                     break;
-                case 'a': case 'A': {
+                case 'd': case 'D': {
                     if (lateralVel.load() < LINEAR_VEL_LIMIT) {
                             lateralVel.store(lateralVel.load() + LINEAR_INCREMENT);
                         }
                     }
                     printVelocities();
                     break;
-                case 'd': case 'D': {
+                case 'a': case 'A': {
                     if (lateralVel.load() > -LINEAR_VEL_LIMIT) {
                             lateralVel.store(lateralVel.load() - LINEAR_INCREMENT);
                         }

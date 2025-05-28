@@ -1,4 +1,6 @@
 from servo import servo2040, ServoCluster, Calibration, Servo
+from pimoroni import Analog, AnalogMux
+from machine import Pin
 import select
 import sys
 from time import sleep
@@ -36,15 +38,15 @@ cal[17].apply_two_pairs(1060, 2020, -45, 45), # 18: R12
 cal[0].apply_two_pairs(2020, 1050, -45, 45), # 1: L31
 cal[1].apply_two_pairs(2020, 1020, -45, 45), # 2: L32
 cal[2].apply_two_pairs(1980, 970, -45, 45), # 3: L33
-cal[5].apply_two_pairs(2060, 980, -45, 45), # 6: R31 # Coxa
-cal[8].apply_two_pairs(1960, 920, -45, 45), # 9: L23 # Coxa
+cal[5].apply_two_pairs(2060, 980, -45, 45), # 6: R31 #
+cal[8].apply_two_pairs(1960, 920, -45, 45), # 9: L23 #
 cal[9].apply_two_pairs(1990, 960, -45, 45), # 10: R23
 cal[10].apply_two_pairs(2000, 950, -45, 45), # 11: R22
 cal[11].apply_two_pairs(1930, 910, -45, 45), # 12: R21
 cal[12].apply_two_pairs(1900, 890, -45, 45), # 13: L11
 cal[13].apply_two_pairs(1950, 930, -45, 45), # 14: L12
 cal[14].apply_two_pairs(2020, 1000, -45, 45), # 15: L13
-cal[17].apply_two_pairs(2020, 1060, -45, 45), # 18: R12 # Coxa
+cal[17].apply_two_pairs(2020, 1060, -45, 45), # 18: R12 #
 
 
 def parse_angles(command: str) -> list[float]:
@@ -66,6 +68,23 @@ def main():
     cluster = [None]
     pins[0] = list(range(servo2040.SERVO_1, servo2040.SERVO_18 + 1))
     cluster[0] = ServoCluster(1, 0, pins[0])
+        
+    # Set up the shared analog inputs
+    sen_adc = Analog(servo2040.SHARED_ADC)
+    vol_adc = Analog(servo2040.SHARED_ADC, servo2040.VOLTAGE_GAIN)
+    cur_adc = Analog(servo2040.SHARED_ADC, servo2040.CURRENT_GAIN,
+                     servo2040.SHUNT_RESISTOR, servo2040.CURRENT_OFFSET)
+
+    # Set up the analog multiplexer, including the pin for controlling pull-up/pull-down
+    mux = AnalogMux(servo2040.ADC_ADDR_0, servo2040.ADC_ADDR_1, servo2040.ADC_ADDR_2,
+                    muxed_pin=Pin(servo2040.SHARED_ADC))
+
+    # Set up the sensor addresses and have them pulled down by default
+    sensor_addrs = list(range(servo2040.SENSOR_1_ADDR, servo2040.SENSOR_6_ADDR + 1))
+    for addr in sensor_addrs:
+        mux.configure_pull(addr, Pin.PULL_DOWN)
+    
+    print("Sensors initialised")
     
     # Apply servo calibration
     for i in range(num_servos):
@@ -118,6 +137,14 @@ def main():
     
     # Listen for commands
     while True:
+        print("touch:", end="")
+        for i in range(len(sensor_addrs)):
+            if i != 0:
+                print(";", end="")
+            mux.select(sensor_addrs[i])
+            print(1 if sen_adc.read_voltage() > 2.4 else 0, end="")
+        print("")
+            
         if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
             cmd = sys.stdin.readline().strip()
 

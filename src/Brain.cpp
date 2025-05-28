@@ -25,6 +25,7 @@ Brain::Brain( Controller* controller, GaitType gaitType )
         std::tie(f, l, r) = controller->getVelocities();
         updateVelocity(f, l, r);
         updateLegs();
+        touchState = stateTransmitter->getTouchState();
         std::this_thread::sleep_for(std::chrono::milliseconds(sleepDuration));
     }
 }

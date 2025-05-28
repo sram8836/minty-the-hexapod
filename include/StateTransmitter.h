@@ -21,6 +21,8 @@ class StateTransmitter {
 
         void sendAngles();
 
+        std::vector<int> getTouchState();
+
     private:
         // Private members
         std::vector<float> servoAngles;

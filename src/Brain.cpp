@@ -21,14 +21,22 @@ Brain::Brain( Controller* controller, GaitType gaitType )
 
     std::cout << "Brain created" << std::endl;
 
+    int cliffCount = 0;
+
     while (true) {
-        updateTouchState();
+        // updateTouchState();
         updateVelocity();
         updateLegs();
 
         if (centralStepPercent == 0.75 && !(touchState[4] && touchState[5]) ) {
-            std::cout << "Cliff detected. Cancelling remote control" << std::endl;
-            break;
+            cliffCount += 1;
+            if (cliffCount > updateFrequency) {
+                std::cout << "Cliff detected. Cancelling remote control" << std::endl;
+                break;
+            }
+        }
+        else {
+            cliffCount = 0;
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(sleepDuration));

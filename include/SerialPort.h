@@ -6,6 +6,7 @@
 #include <string.h>
 #include <string>
 #include <vector>
+#include <sstream>
 
 class SerialPort {
 public:

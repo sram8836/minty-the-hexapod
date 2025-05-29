@@ -41,6 +41,22 @@ void Leg::setStepPercent( float stepPercent ) {
 }
 
 
+void Leg::registerTouch() { 
+
+    std::tuple<float, float, float> touchPoint = trajectory[stepPercent];
+    float newZNom = std::get<2>(touchPoint);
+    if (newZNom < maxHeight) {
+        zNom = maxHeight;
+    }
+    return;
+}
+
+
+void Leg::registerUntouch() { 
+    zNom = baseHeight;
+}
+
+
 float Leg::getFlipFactor()
 {   
     int isLeft = index == 0 || index == 3 || index == 4;

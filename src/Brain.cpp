@@ -75,12 +75,14 @@ void Brain::updateTouchState() {
     for (int i=0; i<numLegs; i++) {
         if (isOne[i]) {
             if (touchState[i] == 0) {
-                // legs[i]->registerTouch();
-                std::cout << "Register touch" << std::endl;
+                legs[i]->registerTouch();
             }
             touchState[i] = 1;
         }
         else if (isZero[i]) {
+            if (touchState[i] == 1) {
+                legs[i]->registerUntouch();
+            }
             touchState[i] = 0;
         }
     }

@@ -44,8 +44,14 @@ Brain::~Brain() {
 void Brain::updateLegs() {
 
     // Advance stepPercent according to velocity and previous stepPercent
-    centralStepPercent += 1.0f;
-    // centralStepPercent += (2.0f*linearMag) / (stepLength*updateFrequency);
+    if (linearMag > maxStepSize) {
+        centralStepPercent += linearMag / updateFrequency;
+    }
+    else {
+        centralStepPercent += 2.0f;
+    }
+
+    // Wrap percentage
     centralStepPercent = centralStepPercent > 100.0f ? centralStepPercent - 100.0f : centralStepPercent;
     
     // Update legs according to gait paramupdateFrequencyeters
@@ -69,11 +75,9 @@ void Brain::updateLegs() {
 
 float Brain::getFlipFactor( int i )
 {   
-    // int isLeft = i == 0 || i == 3 || i == 4;
-    // int isRight = i == 1 || i == 2 || i == 5;
     int isLeft = i == 0 || i == 3 || i == 4;
     int isRight = i == 2 || i == 1 || i == 5;
-    return static_cast<float>(isRight - isLeft);
+    return static_cast<float>(isLeft- isRight);
 }
 
 
@@ -81,7 +85,7 @@ void Brain::updateVelocity( float forwardVel, float lateralVel, float rotational
 
     for (int i = 0; i < legs.size(); i++) {
         float rotationAngle = -(legConfig[i] + M_PI);
-        float rotationMag = getFlipFactor(i)*500*std::abs(rotationalVel);
+        float rotationMag = getFlipFactor(i)*500*rotationalVel;
 
         // Add velocity component which is orthogonal to mount angle
         float totalForward = forwardVel + rotationMag*std::cos(rotationAngle);
@@ -90,6 +94,12 @@ void Brain::updateVelocity( float forwardVel, float lateralVel, float rotational
         // Calculate sum angle and magnitude of linear velocities 
         float linearMag = std::sqrt(totalForward * totalForward + totalLateral * totalLateral);
         float linearAngle = std::atan2(-totalLateral, totalForward);
+
+        this->linearMag = linearMag;
+
+        if (linearMag > maxStepSize) {
+            linearMag = maxStepSize;
+        }
 
         legs[i]->setStepAngle(linearAngle);
         legs[i]->setStepSize(linearMag);

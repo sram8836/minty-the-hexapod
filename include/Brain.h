@@ -20,6 +20,7 @@ class Brain {
     private:
         // Constants
         const float updateFrequency = 50.0f;
+        const float maxStepSize = 150.0f;
         const int sleepDuration = static_cast<int>(1000.0f / updateFrequency);
         const std::vector<float> legConfig = {
             M_PI/4, -M_PI/4, 0, 0, -M_PI/4, M_PI/4}; // All RHS servos reversed

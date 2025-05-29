@@ -47,42 +47,42 @@ void Controller::inputLoop() {
                     printVelocities();
                     break;
                 case 'w': case 'W': {
-                    if (lateralVel.load() < LINEAR_VEL_LIMIT) {
+                    if (lateralVel.load() <= LINEAR_VEL_LIMIT - LINEAR_INCREMENT) {
                             forwardVel.store(forwardVel.load() + LINEAR_INCREMENT);
                         }
                     }
                     printVelocities();
                     break;
                 case 'z': case 'Z': {
-                    if (lateralVel.load() > -LINEAR_VEL_LIMIT) {
+                    if (lateralVel.load() >= -LINEAR_VEL_LIMIT + LINEAR_INCREMENT) {
                             forwardVel.store(forwardVel.load() - LINEAR_INCREMENT);
                         }
                     }
                     printVelocities();
                     break;
                 case 'd': case 'D': {
-                    if (lateralVel.load() < LINEAR_VEL_LIMIT) {
+                    if (lateralVel.load() <= LINEAR_VEL_LIMIT - LINEAR_INCREMENT) {
                             lateralVel.store(lateralVel.load() + LINEAR_INCREMENT);
                         }
                     }
                     printVelocities();
                     break;
                 case 'a': case 'A': {
-                    if (lateralVel.load() > -LINEAR_VEL_LIMIT) {
+                    if (lateralVel.load() >= -LINEAR_VEL_LIMIT + LINEAR_INCREMENT) {
                             lateralVel.store(lateralVel.load() - LINEAR_INCREMENT);
                         }
                     }
                     printVelocities();
                     break;
                 case 'q': case 'Q': {
-                    if (rotationalVel.load() < ROTATIONAL_VEL_LIMIT) {
+                    if (rotationalVel.load() <= ROTATIONAL_VEL_LIMIT - ROTATIONAL_INCREMENT) {
                             rotationalVel.store(rotationalVel.load() + ROTATIONAL_INCREMENT);
                         }
                     }
                     printVelocities();
                     break;
                 case 'e': case 'E': {
-                    if (rotationalVel.load() > -ROTATIONAL_VEL_LIMIT) {
+                    if (rotationalVel.load() >= -ROTATIONAL_VEL_LIMIT + ROTATIONAL_INCREMENT) {
                             rotationalVel.store(rotationalVel.load() - ROTATIONAL_INCREMENT);
                         }
                     }

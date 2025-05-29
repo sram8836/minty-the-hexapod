@@ -19,11 +19,12 @@ class Brain {
 
     private:
         // Constants
-        const float updateFrequency = 50.0f;
-        const float maxStepSize = 150.0f;
-        const int sleepDuration = static_cast<int>(1000.0f / updateFrequency);
+        const int bufferSize = 5; // For touch buffer
+        const float updateFrequency = 50.0f; // Hz
+        const float maxStepSize = 150.0f; // mm
+        const int sleepDuration = static_cast<int>(1000.0f / updateFrequency); // ms
         const std::vector<float> legConfig = {
-            M_PI/4, -M_PI/4, 0, 0, -M_PI/4, M_PI/4}; // All RHS servos reversed
+            M_PI/4, -M_PI/4, 0, 0, -M_PI/4, M_PI/4}; // rad
         
         // Variables
         std::vector<Leg*> legs;
@@ -42,7 +43,7 @@ class Brain {
 
         void updateTouchState();
 
-        void updateVelocity( float forwardVel, float lateralVel, float rotationalVel );
+        void updateVelocity();
 
         float getFlipFactor( int i );
 };

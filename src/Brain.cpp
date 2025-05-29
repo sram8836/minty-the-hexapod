@@ -3,10 +3,10 @@
 // Constructor
 Brain::Brain( Controller* controller, GaitType gaitType )
 : linearMag ( 0.0f ),
-  linearAngle ( 0.0f*M_PI ),
+  linearAngle ( 0.0f ),
   rotationalVel ( 0.0f ),
   centralStepPercent ( 0.0f ),
-  gaitParams(GaitParameters[gaitType]),
+  gaitParams( GaitParameters[gaitType] ),
   controller( controller )
 {   
     // Create state transmitter
@@ -17,16 +17,14 @@ Brain::Brain( Controller* controller, GaitType gaitType )
         legs.push_back(new Leg(i, legConfig[i], stateTransmitter));
     }
 
+    touchState = {0,0,0,0,0,0};
+
     std::cout << "Brain created" << std::endl;
 
-    float f, l, r;
-
     while (true) {
-        std::tie(f, l, r) = controller->getVelocities();
-        updateVelocity(f, l, r);
-        updateLegs();
         updateTouchState();
-        touchState = stateTransmitter->getTouchState();
+        updateVelocity();
+        updateLegs();
 
         if (centralStepPercent == 0.75 && !(touchState[4] && touchState[5]) ) {
             std::cout << "Cliff detected. Cancelling remote control" << std::endl;
@@ -49,7 +47,43 @@ Brain::~Brain() {
 
 
 void Brain::updateTouchState() {
-    return;
+    std::vector<int> newTouch = stateTransmitter->getTouchState();
+
+    // Shift new value into buffer
+    touchBuffer.insert(touchBuffer.begin(), newTouch);
+    
+    // Shift old value out of buffer if full
+    if (touchBuffer.size() >= bufferSize) {
+        touchBuffer.pop_back();
+    }
+
+    // And touch sensor value for each leg
+    const int numLegs = 6;
+    int isOne[numLegs] = {0,0,0,0,0,0};
+    int isZero[numLegs] = {0,0,0,0,0,0};
+
+    for (int i=0; i<numLegs; i++) {
+        isOne[i] = touchBuffer[0][i];
+        isZero[i] = !touchBuffer[0][i];
+
+        for (int j=0; j<touchBuffer.size(); j++) {
+            isOne[i] &= touchBuffer[j][i];
+            isZero[i] &= !touchBuffer[j][i];
+        }
+    }
+
+    for (int i=0; i<numLegs; i++) {
+        if (isOne[i]) {
+            if (touchState[i] == 0) {
+                // legs[i]->registerTouch();
+                std::cout << "Register touch" << std::endl;
+            }
+            touchState[i] = 1;
+        }
+        else if (isZero[i]) {
+            touchState[i] = 0;
+        }
+    }
 }
 
 
@@ -67,19 +101,6 @@ void Brain::updateLegs() {
     if (centralStepPercent > 100.0f) {
         centralStepPercent -= 100.0f;
     }
-
-    // Update legs according to gait paramupdateFrequencyeters
-    // for (int i = 0; i<legs.size(); i += gaitParams.legsPerStep) {
-
-    //     float movement_index = i / gaitParams.legsPerStep;
-    //     float stepPercent = centralStepPercent + 100.0f*movement_index*(gaitParams.phaseDelay/360.0f);
-    //     stepPercent = stepPercent > 100.0f ? stepPercent - 100.0f : stepPercent;
-
-    //     for (int j = 0; j<gaitParams.legsPerStep; j++) {
-    //         int legIndex = gaitParams.legSequence[i + j];
-    //         legs[legIndex]->setStepPercent(stepPercent);
-    //     }
-    // }
 
     for (int seqIndex = 0; seqIndex < numLegs; ++seqIndex) {
         int legIndex = gaitParams.legSequence[seqIndex];
@@ -102,7 +123,10 @@ float Brain::getFlipFactor( int i )
 }
 
 
-void Brain::updateVelocity( float forwardVel, float lateralVel, float rotationalVel ) {
+void Brain::updateVelocity() {
+
+    float forwardVel, lateralVel, rotationalVel;
+    std::tie(forwardVel, lateralVel, rotationalVel) = controller->getVelocities();
 
     for (int i = 0; i < legs.size(); i++) {
         float rotationAngle = -(legConfig[i] + M_PI);

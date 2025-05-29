@@ -67,26 +67,31 @@ void Brain::updateLegs() {
 }
 
 
+float Brain::getFlipFactor( int i )
+{   
+    // int isLeft = i == 0 || i == 3 || i == 4;
+    // int isRight = i == 1 || i == 2 || i == 5;
+    int isLeft = i == 0 || i == 3 || i == 4;
+    int isRight = i == 2 || i == 1 || i == 5;
+    return static_cast<float>(isRight - isLeft);
+}
+
+
 void Brain::updateVelocity( float forwardVel, float lateralVel, float rotationalVel ) {
 
-    // Calculate sum angle and magnitude of linear velocities 
-    float linearMag = std::sqrt(forwardVel * forwardVel + lateralVel * lateralVel);
-    float linearAngle = std::atan2(-lateralVel, forwardVel);
+    for (int i = 0; i < legs.size(); i++) {
+        float rotationAngle = -(legConfig[i] + M_PI);
+        float rotationMag = getFlipFactor(i)*500*std::abs(rotationalVel);
 
-    // Update leg trajectory if changed
-    if (this->linearAngle != linearAngle) {
-        this->linearAngle = linearAngle;
-        
-        for (Leg* leg : legs) {
-            leg->setStepAngle(linearAngle);
-        }
-    }
+        // Add velocity component which is orthogonal to mount angle
+        float totalForward = forwardVel + rotationMag*std::cos(rotationAngle);
+        float totalLateral = lateralVel + rotationMag*std::sin(rotationAngle);
 
-    if (this->linearMag != linearMag) {
-        this->linearMag = linearMag;
-        
-        for (Leg* leg : legs) {
-            leg->setStepSize(linearMag);
-        }
+        // Calculate sum angle and magnitude of linear velocities 
+        float linearMag = std::sqrt(totalForward * totalForward + totalLateral * totalLateral);
+        float linearAngle = std::atan2(-totalLateral, totalForward);
+
+        legs[i]->setStepAngle(linearAngle);
+        legs[i]->setStepSize(linearMag);
     }
 }

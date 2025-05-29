@@ -39,4 +39,6 @@ class Brain {
         void updateLegs();
 
         void updateVelocity( float forwardVel, float lateralVel, float rotationalVel );
+
+        float getFlipFactor( int i );
 };

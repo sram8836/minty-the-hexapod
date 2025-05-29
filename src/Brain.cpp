@@ -7,7 +7,9 @@ Brain::Brain( Controller* controller, GaitType gaitType )
   rotationalVel ( 0.0f ),
   centralStepPercent ( 0.0f ),
   gaitParams( GaitParameters[gaitType] ),
-  controller( controller )
+  controller( controller ),
+  cliffCount( 0 ),
+  touchState( {0,0,0,0,0,0} )
 {   
     // Create state transmitter
     stateTransmitter = new StateTransmitter();
@@ -17,28 +19,16 @@ Brain::Brain( Controller* controller, GaitType gaitType )
         legs.push_back(new Leg(i, legConfig[i], stateTransmitter));
     }
 
-    touchState = {0,0,0,0,0,0};
-
     std::cout << "Brain created" << std::endl;
 
-    int cliffCount = 0;
-
     while (true) {
-        // updateTouchState();
         updateVelocity();
         updateLegs();
 
-        if (centralStepPercent == 0.75 && !(touchState[4] && touchState[5]) ) {
-            cliffCount += 1;
-            if (cliffCount > updateFrequency) {
-                std::cout << "Cliff detected. Cancelling remote control" << std::endl;
-                break;
-            }
+        if (checkForCliff()) {
+            break;
         }
-        else {
-            cliffCount = 0;
-        }
-
+    
         std::this_thread::sleep_for(std::chrono::milliseconds(sleepDuration));
     }
 }
@@ -54,46 +44,20 @@ Brain::~Brain() {
 }
 
 
-void Brain::updateTouchState() {
-    std::vector<int> newTouch = stateTransmitter->getTouchState();
+int Brain::checkForCliff() {
+    touchState = stateTransmitter->getTouchState();
 
-    // Shift new value into buffer
-    touchBuffer.insert(touchBuffer.begin(), newTouch);
-    
-    // Shift old value out of buffer if full
-    if (touchBuffer.size() >= bufferSize) {
-        touchBuffer.pop_back();
-    }
-
-    // And touch sensor value for each leg
-    const int numLegs = 6;
-    int isOne[numLegs] = {0,0,0,0,0,0};
-    int isZero[numLegs] = {0,0,0,0,0,0};
-
-    for (int i=0; i<numLegs; i++) {
-        isOne[i] = touchBuffer[0][i];
-        isZero[i] = !touchBuffer[0][i];
-
-        for (int j=0; j<touchBuffer.size(); j++) {
-            isOne[i] &= touchBuffer[j][i];
-            isZero[i] &= !touchBuffer[j][i];
+    if (centralStepPercent >= 0.75 && !(touchState[4] && touchState[5]) ) {
+        cliffCount += 1;
+        if (cliffCount > 25) {
+            std::cout << "Cliff detected. Cancelling remote control" << std::endl;
+            return 1;
         }
     }
-
-    for (int i=0; i<numLegs; i++) {
-        if (isOne[i]) {
-            if (touchState[i] == 0) {
-                legs[i]->registerTouch();
-            }
-            touchState[i] = 1;
-        }
-        else if (isZero[i]) {
-            if (touchState[i] == 1) {
-                legs[i]->registerUntouch();
-            }
-            touchState[i] = 0;
-        }
+    else {
+        cliffCount = 0;
     }
+    return 0;
 }
 
 

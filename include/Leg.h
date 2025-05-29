@@ -20,10 +20,6 @@ class Leg {
 
         void setStepPercent( float stepPercent );
 
-        void registerTouch();
-
-        void registerUntouch();
-
         std::vector<float> solveInverseKinematics(float x, float y, float z);
 
         void saveTrajectory();
@@ -37,7 +33,6 @@ class Leg {
         float yNom = 0.0f; // mm
         float zNom = -70.0f; // mm
         
-
         // DH parameters
         const float l1 = 43.0f;  // mm L1: Coxa
         const float l2 = 80.0f;  // mm L2: Femur

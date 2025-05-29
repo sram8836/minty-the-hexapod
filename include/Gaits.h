@@ -7,6 +7,8 @@ const int numLegs = 6;
 enum GaitType {
     TRIPOD,
     RIPPLE,
+    BIRIPPLE,
+    WAVE,
     DANCE
 };
 

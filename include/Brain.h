@@ -28,6 +28,7 @@ class Brain {
         // Variables
         std::vector<Leg*> legs;
         std::vector<int> touchState;
+        std::vector<std::vector<int>> touchBuffer;
         GaitParameterSet gaitParams;
         StateTransmitter* stateTransmitter;
         Controller *controller;
@@ -38,6 +39,8 @@ class Brain {
 
         // Methods
         void updateLegs();
+
+        void updateTouchState();
 
         void updateVelocity( float forwardVel, float lateralVel, float rotationalVel );
 

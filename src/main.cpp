@@ -6,7 +6,7 @@
 int main() {
 
     Controller* controller = new Controller();
-    Brain* hexapod = new Brain(controller);
+    Brain* hexapod = new Brain(controller, DANCE);
 
     return 0;
 }

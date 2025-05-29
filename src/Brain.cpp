@@ -25,7 +25,14 @@ Brain::Brain( Controller* controller, GaitType gaitType )
         std::tie(f, l, r) = controller->getVelocities();
         updateVelocity(f, l, r);
         updateLegs();
+        updateTouchState();
         touchState = stateTransmitter->getTouchState();
+
+        if (centralStepPercent == 0.75 && !(touchState[4] && touchState[5]) ) {
+            std::cout << "Cliff detected. Cancelling remote control" << std::endl;
+            break;
+        }
+
         std::this_thread::sleep_for(std::chrono::milliseconds(sleepDuration));
     }
 }
@@ -41,6 +48,11 @@ Brain::~Brain() {
 }
 
 
+void Brain::updateTouchState() {
+    return;
+}
+
+
 void Brain::updateLegs() {
 
     // Advance stepPercent according to velocity and previous stepPercent
@@ -52,22 +64,31 @@ void Brain::updateLegs() {
     }
 
     // Wrap percentage
-    centralStepPercent = centralStepPercent > 100.0f ? centralStepPercent - 100.0f : centralStepPercent;
-    
-    // Update legs according to gait paramupdateFrequencyeters
-    for (int i = 0; i<legs.size(); i += gaitParams.legsPerStep) {
-
-        float movement_index = i / gaitParams.legsPerStep;
-        float stepPercent = centralStepPercent + 100.0f*movement_index*(gaitParams.phaseDelay/360.0f);
-        stepPercent = stepPercent > 100.0f ? stepPercent - 100.0f : stepPercent;
-
-        for (int j = 0; j<gaitParams.legsPerStep; j++) {
-            int legIndex = gaitParams.legSequence[i + j];
-            legs[legIndex]->setStepPercent(stepPercent);
-        }
+    if (centralStepPercent > 100.0f) {
+        centralStepPercent -= 100.0f;
     }
 
-    // TODO: implement duty cycle logic
+    // Update legs according to gait paramupdateFrequencyeters
+    // for (int i = 0; i<legs.size(); i += gaitParams.legsPerStep) {
+
+    //     float movement_index = i / gaitParams.legsPerStep;
+    //     float stepPercent = centralStepPercent + 100.0f*movement_index*(gaitParams.phaseDelay/360.0f);
+    //     stepPercent = stepPercent > 100.0f ? stepPercent - 100.0f : stepPercent;
+
+    //     for (int j = 0; j<gaitParams.legsPerStep; j++) {
+    //         int legIndex = gaitParams.legSequence[i + j];
+    //         legs[legIndex]->setStepPercent(stepPercent);
+    //     }
+    // }
+
+    for (int seqIndex = 0; seqIndex < numLegs; ++seqIndex) {
+        int legIndex = gaitParams.legSequence[seqIndex];
+
+        float offsetDegrees = gaitParams.phaseDelay * seqIndex;
+        float legStepPercent = fmod(centralStepPercent + (offsetDegrees / 360.0f) * 100.0f, 100.0f);
+
+        legs[legIndex]->setStepPercent(legStepPercent);
+    }
 
     stateTransmitter->sendAngles();
 }

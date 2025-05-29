@@ -6,9 +6,8 @@ const int numLegs = 6;
 
 enum GaitType {
     TRIPOD,
-    WAVE,
     RIPPLE,
-    QUADRUPED
+    DANCE
 };
 
 struct GaitParameterSet {

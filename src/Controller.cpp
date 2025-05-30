@@ -121,16 +121,16 @@ void Controller::inputLoop() {
                     std::cout << "Switching to DANCE" << std::endl;
                     break;
                 }
-                case '-': {
-                    // Decrease height
+                case '+': {
+                    // Increase height
                     if (height >= -180 + HEIGHT_INCREMENT) {
                         height -= HEIGHT_INCREMENT;
                     }
                     std::cout << "Decreasing height to " << height << std::endl;
                     break;
                 }
-                case '+': {
-                    // Increase height
+                case '-': {
+                    // Decrease height
                     if (height <= -40 - HEIGHT_INCREMENT) {
                         height += HEIGHT_INCREMENT;
                     }

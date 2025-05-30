@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <map>
 
 const int numLegs = 6;
 
@@ -8,7 +9,6 @@ enum GaitType {
     TRIPOD,
     RIPPLE,
     BIRIPPLE,
-    WAVE,
     DANCE
 };
 

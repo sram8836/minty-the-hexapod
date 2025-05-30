@@ -5,6 +5,7 @@ Controller::Controller()
 : forwardVel(0.0f), lateralVel(0.0f), rotationalVel(0.0f), running(true)
 {   
     std::cout << "Controller created" << std::endl;
+    switchGait(0);
     inputThread = std::thread(&Controller::inputLoop, this);
 }
 
@@ -23,6 +24,7 @@ Controller::~Controller() {
 std::tuple<float, float, float> Controller::getVelocities() const {
     return {forwardVel.load(), lateralVel.load(), rotationalVel.load()};
 }
+
 
 
 // stdin to non-blocking
@@ -88,6 +90,22 @@ void Controller::inputLoop() {
                     }
                     printVelocities();
                     break;
+                case '0': {
+                    // TRIPOD Gait
+                    switchGait(0);
+                }
+                case '1': {
+                    // RIPPLE Gait
+                    switchGait(1);
+                }
+                case '2': {
+                    // BIRIPPLE Gait
+                    switchGait(2);
+                }
+                case '3': {
+                    // DANCE Gait
+                    switchGait(3);
+                }
             }
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(sleepDuration));
@@ -95,6 +113,28 @@ void Controller::inputLoop() {
 
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);    // restore terminal
 }
+
+
+GaitParameterSet Controller::getGait() {
+    return currGait;
+}
+
+void Controller::switchGait(int newGait) {
+    
+    if (newGait == 0) {
+        currGait = GaitParameters[TRIPOD];
+    }
+    else if (newGait == 1) {
+        currGait = GaitParameters[RIPPLE];
+    }
+    else if (newGait == 2) {
+        currGait = GaitParameters[BIRIPPLE];
+    }
+    else if (newGait == 3) {
+        currGait = GaitParameters[DANCE];
+    }
+}
+
 
 void Controller::printVelocities() {
 

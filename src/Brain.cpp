@@ -76,6 +76,8 @@ void Brain::updateLegs() {
         centralStepPercent -= 100.0f;
     }
 
+    gaitParams = controller->getGait();
+
     for (int seqIndex = 0; seqIndex < numLegs; ++seqIndex) {
         int legIndex = gaitParams.legSequence[seqIndex];
 

@@ -7,11 +7,15 @@
 #include <termios.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include "Gaits.h"
 
 class Controller {
 public:
     Controller();
     ~Controller();
+
+    // Methods
+    GaitParameterSet getGait();
 
     std::tuple<float, float, float> getVelocities() const;
 
@@ -30,9 +34,12 @@ private:
     std::atomic<float> rotationalVel;
     std::thread inputThread;
     std::atomic<bool> running;
+    GaitParameterSet currGait;
     
     // Methods
     void inputLoop();
+
+    void switchGait(int newGait);
 
     void printVelocities();
 };

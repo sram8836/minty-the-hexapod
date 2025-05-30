@@ -6,6 +6,7 @@ Controller::Controller()
 {   
     std::cout << "Controller created" << std::endl;
     currGait = GaitParameters[TRIPOD];
+    height = -70.0f;
     inputThread = std::thread(&Controller::inputLoop, this);
 }
 
@@ -109,9 +110,31 @@ void Controller::inputLoop() {
                     break;
                 }
                 case '4': {
+                    // WAVE Gait
+                    currGait = GaitParameters[WAVE];
+                    std::cout << "Switching to WAVE" << std::endl;
+                    break;
+                }
+                case '5': {
                     // DANCE Gait
                     currGait = GaitParameters[DANCE];
                     std::cout << "Switching to DANCE" << std::endl;
+                    break;
+                }
+                case '-': {
+                    // Decrease height
+                    if (height >= -180 + HEIGHT_INCREMENT) {
+                        height -= HEIGHT_INCREMENT;
+                    }
+                    std::cout << "Decreasing height to " << height << std::endl;
+                    break;
+                }
+                case '+': {
+                    // Increase height
+                    if (height <= -40 - HEIGHT_INCREMENT) {
+                        height += HEIGHT_INCREMENT;
+                    }
+                    std::cout << "Increasing height to " << height << std::endl;
                     break;
                 }
             }
@@ -125,6 +148,10 @@ void Controller::inputLoop() {
 
 GaitParameterSet Controller::getGait() {
     return currGait;
+}
+
+float Controller::getHeight() {
+    return height;
 }
 
 void Controller::printVelocities() {

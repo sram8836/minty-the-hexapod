@@ -20,6 +20,8 @@ class Leg {
 
         void setStepPercent( float stepPercent );
 
+        void setZNom( float newZNom );
+
         std::vector<float> solveInverseKinematics(float x, float y, float z);
 
         void saveTrajectory();

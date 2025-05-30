@@ -24,6 +24,13 @@ std::unordered_map<GaitType, GaitParameterSet> GaitParameters = {
         2,
         {0,3,1,5,2,4},
     },},
+    {WAVE, {
+        60.0f,
+        83.3f,
+        2.0f,
+        1,
+        {1,0,2,3,5,4},
+    },},
     {DANCE, {
         180.0f,
         50.0f,

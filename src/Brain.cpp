@@ -25,9 +25,9 @@ Brain::Brain( Controller* controller, GaitType gaitType )
         updateVelocity();
         updateLegs();
 
-        if (checkForCliff()) {
-            break;
-        }
+        // if (checkForCliff()) {
+        //     break;
+        // }
     
         std::this_thread::sleep_for(std::chrono::milliseconds(sleepDuration));
     }
@@ -124,5 +124,6 @@ void Brain::updateVelocity() {
 
         legs[i]->setStepAngle(linearAngle);
         legs[i]->setStepSize(linearMag);
+        legs[i]->setZNom(controller->getHeight());
     }
 }

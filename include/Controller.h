@@ -17,6 +17,8 @@ public:
     // Methods
     GaitParameterSet getGait();
 
+    float getHeight();
+
     std::tuple<float, float, float> getVelocities() const;
 
 private:
@@ -27,6 +29,7 @@ private:
     const float ROTATIONAL_VEL_LIMIT = 0.5f; // rad
     const float updateFrequency = 10.0f; // Hz
     const int sleepDuration = static_cast<int>(1000.0f / updateFrequency);
+    const float HEIGHT_INCREMENT = 10.0f;
 
     // Variables
     std::atomic<float> forwardVel;
@@ -35,6 +38,7 @@ private:
     std::thread inputThread;
     std::atomic<bool> running;
     GaitParameterSet currGait;
+    float height;
     
     // Methods
     void inputLoop();

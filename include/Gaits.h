@@ -9,6 +9,7 @@ enum GaitType {
     TRIPOD,
     RIPPLE,
     BIRIPPLE,
+    WAVE,
     DANCE
 };
 

@@ -41,6 +41,13 @@ void Leg::setStepPercent( float stepPercent ) {
 }
 
 
+void Leg::setZNom( float newZNom) {
+    zNom = newZNom;
+    xNom = sqrt(pow(200.0f, 2.0f) - pow(zNom, 2.0f));
+    updateJointAngles();
+}
+
+
 float Leg::getFlipFactor()
 {   
     int isLeft = index == 0 || index == 3 || index == 4;

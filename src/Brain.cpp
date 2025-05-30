@@ -25,9 +25,9 @@ Brain::Brain( Controller* controller, GaitType gaitType )
         updateVelocity();
         updateLegs();
 
-        // if (checkForCliff()) {
-        //     break;
-        // }
+        if (checkForCliff()) {
+            break;
+        }
     
         std::this_thread::sleep_for(std::chrono::milliseconds(sleepDuration));
     }
@@ -49,7 +49,7 @@ int Brain::checkForCliff() {
 
     if (centralStepPercent >= 0.75 && !(touchState[4] && touchState[5]) ) {
         cliffCount += 1;
-        if (cliffCount > 50) {
+        if (cliffCount > 20) {
             std::cout << "Cliff detected. Cancelling remote control" << std::endl;
             return 1;
         }

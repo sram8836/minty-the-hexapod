@@ -3,7 +3,7 @@
 
 StateTransmitter::StateTransmitter( float txFrequency )
 {   
-    port = SerialPort("/dev/tty.usbmodem14301", B9600);
+    port = SerialPort("/dev/tty.usbmodem1101", B9600);
     // Angus: usbmodem14201
     // Sid  : usbmodem1101
 

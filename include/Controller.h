@@ -39,7 +39,5 @@ private:
     // Methods
     void inputLoop();
 
-    void switchGait(int newGait);
-
     void printVelocities();
 };

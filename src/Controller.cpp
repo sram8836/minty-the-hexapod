@@ -5,7 +5,7 @@ Controller::Controller()
 : forwardVel(0.0f), lateralVel(0.0f), rotationalVel(0.0f), running(true)
 {   
     std::cout << "Controller created" << std::endl;
-    switchGait(0);
+    currGait = GaitParameters[TRIPOD];
     inputThread = std::thread(&Controller::inputLoop, this);
 }
 
@@ -90,21 +90,29 @@ void Controller::inputLoop() {
                     }
                     printVelocities();
                     break;
-                case '0': {
-                    // TRIPOD Gait
-                    switchGait(0);
-                }
                 case '1': {
-                    // RIPPLE Gait
-                    switchGait(1);
+                    // TRIPOD Gait
+                    currGait = GaitParameters[TRIPOD];
+                    std::cout << "Switching to TRIPOD" << std::endl;
+                    break;
                 }
                 case '2': {
-                    // BIRIPPLE Gait
-                    switchGait(2);
+                    // RIPPLE Gait
+                    currGait = GaitParameters[RIPPLE];
+                    std::cout << "Switching to RIPPLE" << std::endl;
+                    break;
                 }
                 case '3': {
+                    // BIRIPPLE Gait
+                    currGait = GaitParameters[BIRIPPLE];
+                    std::cout << "Switching to BIRIPPLE" << std::endl;
+                    break;
+                }
+                case '4': {
                     // DANCE Gait
-                    switchGait(3);
+                    currGait = GaitParameters[DANCE];
+                    std::cout << "Switching to DANCE" << std::endl;
+                    break;
                 }
             }
         }
@@ -118,23 +126,6 @@ void Controller::inputLoop() {
 GaitParameterSet Controller::getGait() {
     return currGait;
 }
-
-void Controller::switchGait(int newGait) {
-    
-    if (newGait == 0) {
-        currGait = GaitParameters[TRIPOD];
-    }
-    else if (newGait == 1) {
-        currGait = GaitParameters[RIPPLE];
-    }
-    else if (newGait == 2) {
-        currGait = GaitParameters[BIRIPPLE];
-    }
-    else if (newGait == 3) {
-        currGait = GaitParameters[DANCE];
-    }
-}
-
 
 void Controller::printVelocities() {
 

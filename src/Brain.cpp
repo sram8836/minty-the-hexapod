@@ -49,7 +49,7 @@ int Brain::checkForCliff() {
 
     if (centralStepPercent >= 0.75 && !(touchState[4] && touchState[5]) ) {
         cliffCount += 1;
-        if (cliffCount > 25) {
+        if (cliffCount > 50) {
             std::cout << "Cliff detected. Cancelling remote control" << std::endl;
             return 1;
         }

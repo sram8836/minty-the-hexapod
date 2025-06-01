@@ -18,6 +18,10 @@ Leg::~Leg() {
     std::cout << "Leg " << index << " destroyed" << std::endl;
 }
 
+float Leg::getBaseHeight() {
+    return baseHeight;
+}
+
 
 void Leg::setStepAngle( float angle )
 {

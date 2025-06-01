@@ -37,13 +37,20 @@ class Brain {
         float rotationalVel;
         float centralStepPercent;
         int cliffCount;
+        std::array<float, 3> orientation;
 
         // Methods
         void updateLegs();
 
         int checkForCliff();
 
+        void stabilise();
+
         void updateVelocity();
 
         float getFlipFactor( int i );
+
+        float radToDeg(float radians) { return radians * (180.0 / M_PI); };
+
+        float degToRad(float degrees) { return degrees * (M_PI / 180.0); };
 };

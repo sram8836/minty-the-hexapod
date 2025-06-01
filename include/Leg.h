@@ -14,6 +14,8 @@ class Leg {
         ~Leg();
 
         // Methods
+        float getBaseHeight();
+
         void setStepAngle( float angle );
 
         void setStepSize( float size );

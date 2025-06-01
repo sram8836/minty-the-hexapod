@@ -23,6 +23,7 @@ Brain::Brain( Controller* controller, GaitType gaitType )
 
     while (true) {
         updateVelocity();
+        stabilise();
         updateLegs();
 
         if (checkForCliff()) {
@@ -125,5 +126,39 @@ void Brain::updateVelocity() {
         legs[i]->setStepAngle(linearAngle);
         legs[i]->setStepSize(linearMag);
         legs[i]->setZNom(controller->getHeight());
+    }
+}
+
+
+void Brain::stabilise() {
+
+    float roll = degToRad(orientation[0]);
+    float pitch = degToRad(orientation[1]);
+    float yaw = degToRad(orientation[2]);
+
+    const float offsetXEnds = 63.0f;
+    const float offsetXMid = 81.5f;
+    const float offsetY = 83.5f;
+
+    float legOffsets[6][2] = {
+        {-offsetXEnds, -offsetY}, // Leg 0
+        { offsetXEnds, -offsetY}, // Leg 1
+        {  offsetXMid,     0.0f}, // Leg 2
+        { -offsetXMid,     0.0f}, // Leg 3
+        {-offsetXEnds,  offsetY}, // Leg 4
+        { offsetXEnds,  offsetY}  // Leg 5
+    };
+
+    for (int i=0; i<legs.size(); ++i) {
+        float x = legOffsets[i][0];
+        float y = legOffsets[i][1];
+
+        // Adjust zNom due to tilt
+
+        float baseZ = legs[i]->getBaseHeight();
+        float dz = - x * sinf(pitch) - y * sinf(roll);
+        float newZNom = baseZ - dz;
+
+        legs[i]->setZNom(newZNom);
     }
 }
